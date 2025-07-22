@@ -1,0 +1,16 @@
+{
+    "name": "luca/qcsv",
+    "description": "This tool represents a CSV manager tool.",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Luca\\Qcsv\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Luca-Andrei Codorean"
+        }
+    ],
+    "require": {}
+}
