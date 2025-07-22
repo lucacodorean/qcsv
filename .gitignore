@@ -1,5 +1,5 @@
 .idea
 bin
 docke*
-
+/public/
 /vendor/
