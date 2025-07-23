@@ -5,6 +5,7 @@ namespace Src;
 use Src\Commands\Command;
 use Src\Commands\IndexCSVCommand;
 use Src\Commands\PrependCSVCommand;
+use Src\Commands\ReformatDateCSVCommand;
 use Src\Commands\RemoveColumnCSVCommand;
 use Src\Commands\ReorderCSVCommand;
 use Src\Commands\TruncateCSVCommand;
@@ -21,6 +22,7 @@ class CommandRunner
         "reorder" => ReorderCSVCommand::class,
         "remove-column" => RemoveColumnCSVCommand::class,
         "truncate" => TruncateCSVCommand::class,
+        "format"   => ReformatDateCSVCommand::class,
     ];
 
     public function __construct(

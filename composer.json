@@ -13,6 +13,7 @@
         }
     ],
     "require": {
-      "ext-mbstring": "*"
+      "ext-mbstring": "*",
+        "nesbot/carbon": "^3.10"
     }
 }
