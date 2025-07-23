@@ -15,4 +15,16 @@ class HeaderWorker {
 
         return $headers;
     }
+
+    public static function retrieve_index_value(array $headers, string $key): int {
+        $index = 0;
+        foreach($headers as $header) {
+            if($header === $key) {
+                return $index;
+            }
+            $index++;
+        }
+        return -1;
+    }
+
 }
