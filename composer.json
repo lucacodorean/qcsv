@@ -12,5 +12,7 @@
             "name": "Luca-Andrei Codorean"
         }
     ],
-    "require": {}
+    "require": {
+      "ext-mbstring": "*"
+    }
 }
