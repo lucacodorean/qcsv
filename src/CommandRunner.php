@@ -5,6 +5,7 @@ namespace Src;
 use Src\Commands\Command;
 use Src\Commands\IndexCSVCommand;
 use Src\Commands\PrependCSVCommand;
+use Src\Commands\RemoveColumnCSVCommand;
 use Src\Commands\ReorderCSVCommand;
 use Src\Services\StreamerService;
 use Src\Services\WriterService;
@@ -17,6 +18,7 @@ class CommandRunner
         "prepend" => PrependCSVCommand::class,
         "index"   => IndexCSVCommand::class,
         "reorder" => ReorderCSVCommand::class,
+        "remove-column" => RemoveColumnCSVCommand::class,
     ];
 
     public function __construct(

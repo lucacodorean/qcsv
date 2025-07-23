@@ -19,17 +19,6 @@ readonly class ReorderCSVCommand implements Command {
         //
     }
 
-    private function retrieve_index_value(array $headers, string $key): int {
-        $index = 0;
-        foreach($headers as $header) {
-            if($header === $key) {
-                return $index;
-            }
-            $index++;
-        }
-        return -1;
-    }
-
     public function execute(string $filepath, string $destination = "public/output.csv", array $options = []): void
     {
         // Given that the command handles reordering of the columns, we assume that the csv has headers.
@@ -52,7 +41,7 @@ readonly class ReorderCSVCommand implements Command {
                 $orderedRow = new Map;
 
                 foreach ($newHeader as $key) {
-                    $orderedRow->put($key,$line[$this->retrieve_index_value($header, $key)]);
+                    $orderedRow->put($key,$line[HeaderWorker::retrieve_index_value($header, $key)]);
                 }
 
                 $csvFile->addRow(new Row($orderedRow->values()->toArray(), $newHeader));
