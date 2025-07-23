@@ -7,6 +7,7 @@ use Src\Commands\IndexCSVCommand;
 use Src\Commands\PrependCSVCommand;
 use Src\Commands\RemoveColumnCSVCommand;
 use Src\Commands\ReorderCSVCommand;
+use Src\Commands\TruncateCSVCommand;
 use Src\Services\StreamerService;
 use Src\Services\WriterService;
 
@@ -19,6 +20,7 @@ class CommandRunner
         "index"   => IndexCSVCommand::class,
         "reorder" => ReorderCSVCommand::class,
         "remove-column" => RemoveColumnCSVCommand::class,
+        "truncate" => TruncateCSVCommand::class,
     ];
 
     public function __construct(

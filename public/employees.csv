@@ -1,3 +1,4 @@
+id,employee,email,age,date,is_active
 1,User_1,user1@example.com,26,2020-01-01,False
 2,User_2,user2@example.com,18,2020-01-02,False
 3,User_3,user3@example.com,46,2020-01-03,True
