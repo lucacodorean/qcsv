@@ -33,13 +33,17 @@ readonly class PrependCSVCommand implements Command
     public function execute(string $filePath, string $destination="public/output.csv", array $options = []): void
     {
         try {
-            $headers = $this->computeHeader($this->streamerService->stream($filePath)->current());
+            $generator = $this->streamerService->stream($filePath);
+            $headers = $this->computeHeader($generator->current());
 
             echo "Prepending a header for csv file at path $filePath... \n";
             $csvFile = new CsvFile();
 
             $firstToBeSkipped = $headers != [];
-            foreach ($this->streamerService->stream($filePath) as $line) {
+
+            $csvFile->addRow(new Row($headers, $headers));
+
+            foreach ($generator as $line) {
                 if($firstToBeSkipped) {
                     $firstToBeSkipped = false;
                     continue;
@@ -49,7 +53,6 @@ readonly class PrependCSVCommand implements Command
             }
 
             $this->writerService->open($destination);
-            $this->writerService->writeRow(new Row($options, []));
             $this->writerService->writeCsv($csvFile);
         } catch (InvalidParametersException $e) {
             echo $e->getMessage();
