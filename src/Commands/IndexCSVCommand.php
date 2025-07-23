@@ -9,8 +9,7 @@ use Src\Services\StreamerService;
 use Src\Services\WriterService;
 use Src\Utils\HeaderWorker;
 
-readonly class PrependCSVCommand implements Command
-{
+readonly class IndexCSVCommand implements Command {
     public function __construct(
         private StreamerService $streamerService,
         private WriterService $writerService,
@@ -18,26 +17,33 @@ readonly class PrependCSVCommand implements Command
         //
     }
 
-    public function execute(string $filePath, string $destination="public/output.csv", array $options = []): void
+    public function execute(string $filepath, string $destination = "public/output.csv", array $options = []): void
     {
         try {
-            $generator = $this->streamerService->stream($filePath);
+            $generator = $this->streamerService->stream($filepath);
+            echo "Indexing the csv file at path $filepath... \n";
+
             $headers = HeaderWorker::computeHeader($generator->current());
+            $hasHeaders = $headers != [];
 
-            echo "Prepending a header for csv file at path $filePath... \n";
             $csvFile = new CsvFile();
+            $index = 1;
 
-            $firstToBeSkipped = $headers != [];
-
-            $csvFile->addRow(new Row($headers, $headers));
+            if($hasHeaders) {
+                $headers[] = "id";
+                $csvFile->addRow(new Row($headers, $headers));
+            }
 
             foreach ($generator as $line) {
-                if($firstToBeSkipped) {
-                    $firstToBeSkipped = false;
+                if($generator->current() == null) break;
+                if($hasHeaders) {
+                    $hasHeaders = false;
                     continue;
                 }
 
-                $csvFile->addRow(new Row($line, $headers));
+                $line[] = $index++;
+                $currentRow = new Row((array)$line, $headers);
+                $csvFile->addRow($currentRow);
             }
 
             $this->writerService->open($destination);
