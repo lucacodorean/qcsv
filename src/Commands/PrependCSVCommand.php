@@ -18,26 +18,27 @@ readonly class PrependCSVCommand implements Command
         //
     }
 
-    public function execute(string $filePath, string $destination="public/output.csv", array $options = []): void
+    public function execute(string $filepath, string $destination="public/output.csv", array $options = []): void
     {
         try {
-            $generator = $this->streamerService->stream($filePath);
-            $headers = HeaderWorker::computeHeader($generator->current());
+            $generator = $this->streamerService->stream($filepath);
+            $newHeader = explode(",", $options[0]);
 
-            echo "Prepending a header for csv file at path $filePath... \n";
+            echo "Prepending a header for csv file at path $filepath... \n";
+
             $csvFile = new CsvFile();
+            $firstToBeSkipped = HeaderWorker::computeHeader($generator->current()) != [];
 
-            $firstToBeSkipped = $headers != [];
-
-            $csvFile->addRow(new Row($headers, $headers));
+            $csvFile->addRow(new Row($newHeader, $newHeader));
 
             foreach ($generator as $line) {
+                if($generator->current() == null) break;
                 if($firstToBeSkipped) {
                     $firstToBeSkipped = false;
                     continue;
                 }
 
-                $csvFile->addRow(new Row($line, $headers));
+                $csvFile->addRow(new Row($line, $newHeader));
             }
 
             $this->writerService->open($destination);

@@ -5,6 +5,7 @@ namespace Src;
 use Src\Commands\Command;
 use Src\Commands\IndexCSVCommand;
 use Src\Commands\PrependCSVCommand;
+use Src\Commands\ReorderCSVCommand;
 use Src\Services\StreamerService;
 use Src\Services\WriterService;
 
@@ -14,7 +15,8 @@ class CommandRunner
 
     private array $commands = [
         "prepend" => PrependCSVCommand::class,
-        "index"   => IndexCSVCommand::class
+        "index"   => IndexCSVCommand::class,
+        "reorder" => ReorderCSVCommand::class,
     ];
 
     public function __construct(
