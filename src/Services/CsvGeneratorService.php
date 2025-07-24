@@ -7,7 +7,7 @@ use SplFileObject;
 use Src\Exceptions\FileNotExistsException;
 use Src\Exceptions\FileOperationException;
 
-class CsvStreamerService implements StreamerService
+class CsvGeneratorService implements StreamerService
 {
 
     private function validateFile(string $filePath): void {

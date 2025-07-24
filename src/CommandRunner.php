@@ -4,6 +4,7 @@ namespace Src;
 
 use Src\Commands\Command;
 use Src\Commands\IndexCSVCommand;
+use Src\Commands\MergeCSVCommand;
 use Src\Commands\PrependCSVCommand;
 use Src\Commands\ReformatDateCSVCommand;
 use Src\Commands\RemoveColumnCSVCommand;
@@ -23,6 +24,7 @@ class CommandRunner
         "remove-column" => RemoveColumnCSVCommand::class,
         "truncate" => TruncateCSVCommand::class,
         "format"   => ReformatDateCSVCommand::class,
+        "merge"    => MergeCSVCommand::class,
     ];
 
     public function __construct(
