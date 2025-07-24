@@ -3,7 +3,13 @@
 namespace Src;
 
 use Src\Commands\Command;
+use Src\Commands\IndexCSVCommand;
+use Src\Commands\MergeCSVCommand;
 use Src\Commands\PrependCSVCommand;
+use Src\Commands\ReformatDateCSVCommand;
+use Src\Commands\RemoveColumnCSVCommand;
+use Src\Commands\ReorderCSVCommand;
+use Src\Commands\TruncateCSVCommand;
 use Src\Services\StreamerService;
 use Src\Services\WriterService;
 
@@ -13,6 +19,12 @@ class CommandRunner
 
     private array $commands = [
         "prepend" => PrependCSVCommand::class,
+        "index"   => IndexCSVCommand::class,
+        "reorder" => ReorderCSVCommand::class,
+        "remove-column" => RemoveColumnCSVCommand::class,
+        "truncate" => TruncateCSVCommand::class,
+        "format"   => ReformatDateCSVCommand::class,
+        "merge"    => MergeCSVCommand::class,
     ];
 
     public function __construct(

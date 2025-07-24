@@ -7,16 +7,20 @@ use SplFileObject;
 use Src\Exceptions\FileNotExistsException;
 use Src\Exceptions\FileOperationException;
 
-class CsvStreamerService implements StreamerService
+class CsvGeneratorService implements StreamerService
 {
 
-    private function validateFile(string $filePath) {
+    private function validateFile(string $filePath): void {
         if(!file_exists($filePath)) {
             throw new FileNotExistsException($filePath);
         }
 
         if(!is_readable($filePath)) {
             throw new FileOperationException("File at path $filePath is not readable.");
+        }
+
+        if(filesize($filePath) == 0) {
+            throw new FileOperationException("File at path $filePath is empty.");
         }
     }
 
@@ -34,6 +38,7 @@ class CsvStreamerService implements StreamerService
 
         } catch (FileNotExistsException|FileOperationException $e) {
             echo $e->getMessage();
+            exit();
         }
     }
 }

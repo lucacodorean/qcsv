@@ -12,5 +12,8 @@
             "name": "Luca-Andrei Codorean"
         }
     ],
-    "require": {}
+    "require": {
+      "ext-mbstring": "*",
+        "nesbot/carbon": "^3.10"
+    }
 }
