@@ -3,16 +3,12 @@
 namespace Src\Commands;
 
 use Carbon\Carbon;
+use Src\Domain\DataTableInterface;
 use Carbon\Exceptions\InvalidFormatException;
-use Src\Domain\CsvFile;
-use Src\Domain\DataTable;
-use Src\Domain\Row;
 use Src\Exceptions\InvalidParametersException;
-use Src\Services\StreamerService;
-use Src\Services\WriterService;
 use Src\Utils\HeaderWorker;
 
-readonly class ReformatDateCSVCommand implements Command {
+readonly class FormatDateCommand implements Command {
 
     public function __construct(
             private string $format
@@ -29,54 +25,35 @@ readonly class ReformatDateCSVCommand implements Command {
         }
     }
 
-    private function validateFormat(string $format): bool {
-        try {
-            $date = Carbon::parse(Carbon::now());
-            return $date->format($format);
-        } catch (InvalidFormatException) {
-            return false;
-        }
-    }
-
     private function formatDate(string $date, string $format): string
     {
         $date = Carbon::parse($date);
         return $date->format($format);
     }
 
-    public function execute(DataTable $initialData): DataTable
+    public function execute(DataTableInterface $initialData): DataTableInterface
     {
+        $firstLine = $initialData->getRows()->first();
+        $headers = HeaderWorker::computeHeader($firstLine->toArray());
+        $hasHeaders = $headers != [];
+
+        $labels = $firstLine->getKeys();
         try {
-
-            if(!$this->validateFormat($options[0])) {
-                echo "Invalid format.";
-                return;
-            }
-
-            $generator = $this->streamerService->stream($filepath);
-            $headers = HeaderWorker::computeHeader($generator->current());
-            $csvFile = new CsvFile;
-
-            echo "Formatting the date columns of csv file at path $filepath to the format: $options[0]. \n";
-
-            foreach ($generator as $line) {
-                if($generator->current() == null) break;
-
-                $rowData = [];
-                foreach ($line as $entry) {
+            foreach ($initialData->getRows() as $row) {
+                foreach ($row->getValues() as $key => $entry) {
                     if($this->validateDateTime($entry)) {
-                        $rowData[] = $this->formatDate($entry, $options[0]);
+                        $row->set(
+                            !$hasHeaders ? $key : $labels[$key],
+                            $this->formatDate($entry, $this->format)
+                        );
                     }
-                    else $rowData[] = $entry;
                 }
-
-                $csvFile->addRow(new Row($rowData, $headers));
             }
 
-            $this->writerService->open($destination);
-            $this->writerService->writeCsv($csvFile);
+            return $initialData;
         } catch (InvalidParametersException $e) {
             echo $e->getMessage();
+            return $initialData;
         }
     }
 }

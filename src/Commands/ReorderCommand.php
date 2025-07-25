@@ -2,54 +2,37 @@
 
 namespace Src\Commands;
 
-use Src\Domain\CsvFile;
+use Src\Domain\DataTableInterface;
+use Ds\Map;
 use Src\Domain\Row;
 use Src\Exceptions\InvalidParametersException;
-use Src\Services\StreamerService;
-use Src\Services\WriterService;
-use Ds\Map;
-use Src\Utils\HeaderWorker;
 
-readonly class ReorderCSVCommand implements Command {
+readonly class ReorderCommand implements Command {
 
     public function __construct(
-        private string $headerLine
+        private array $newOrder
     ) {
         //
     }
 
-    public function execute(string $filepath, string $destination = "public/output.csv", array $options = []): void
+    public function execute(DataTableInterface $initialData): DataTableInterface
     {
-        // Given that the command handles reordering of the columns, we assume that the csv has headers.
 
         try {
-            $generator = $this->streamerService->stream($filepath);
-            if(HeaderWorker::computeHeader($generator->current()) == []) {
-                echo "The csv file at path $filepath file has no valid header.";
-                return;
-            }
-
-            $header = $generator->current();
-            $newHeader = explode(",", $options[0]);
-            $csvFile = new CsvFile();
-
-            echo "Reordering the csv file at path $filepath with the following header: $options[0]. \n";
-
-            foreach ($generator as $line) {
-                if($generator->current() == null) break;
+            $newTable = new DataTableInterface();
+            foreach ($initialData->getRows() as $row) {
                 $orderedRow = new Map;
 
-                foreach ($newHeader as $key) {
-                    $orderedRow->put($key,$line[HeaderWorker::retrieve_index_value($header, $key)]);
+                foreach ($this->newOrder as $key) {
+                    $orderedRow->put($key, $row->get($key));
                 }
 
-                $csvFile->addRow(new Row($orderedRow->values()->toArray(), $newHeader));
+                $newTable->append(Row::fromMap($orderedRow));
             }
-
-            $this->writerService->open($destination);
-            $this->writerService->writeCsv($csvFile);
+            return $newTable;
         } catch (InvalidParametersException $e) {
             echo $e->getMessage();
+            return $initialData;
         }
     }
 }

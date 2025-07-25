@@ -1,35 +1,28 @@
 <?php
 
 namespace Src\Commands;
-
-use Ds\Vector;
-use Src\Domain\DataTable;
-use Src\Exceptions\CSVMergeException;
+use Src\Domain\DataTableInterface;
+use Src\Domain\MergedLazyDataTable;
+use Src\Exceptions\DataTableMergeException;
 use Src\Utils\HeaderWorker;
 
-class MergeCSVCommand implements Command {
-
+class MergeCommand implements Command {
 
     public function __construct(
-        private Ds\Vector $dataTables,
-        private bool $headerAlreadyWritten = false
-    ) {
-        ///
+        private DataTableInterface $dataTable,
+    )
+    {
+
     }
 
-    /**
-     * @throws CSVMergeException
-     */
-    private function validateCSV($firstHandle, $secondHandle): void {
-        $firstHandleFirstLine = fgetcsv($firstHandle, 0, ',', '"', '\\');
-        $secondHandleFirstLine = fgetcsv($secondHandle, 0, ',', '"', '\\');
-
-        if(count($firstHandleFirstLine) !== count($secondHandleFirstLine)) {
-            throw new CSVMergeException("Can't merge the CSVs. They have different line size");
+    private function validateCSV($firstFileFirstLine, $secondFileFirstLine): void {
+        if(count($firstFileFirstLine) !== count($secondFileFirstLine)) {
+            throw new DataTableMergeException("Can't merge the data tables. They have different line size.");
         }
 
-        $firstHeader = HeaderWorker::computeHeader($firstHandleFirstLine);
-        $secondHeader = HeaderWorker::computeHeader($secondHandleFirstLine);
+        $firstHeader = HeaderWorker::computeHeader($firstFileFirstLine);
+        $secondHeader = HeaderWorker::computeHeader($secondFileFirstLine);
+
 
         /// Normally, if the code reaches this if statement and the csv files
         /// dont have headers, the headers array would be equal to [], and the if statement would fail
@@ -39,83 +32,27 @@ class MergeCSVCommand implements Command {
                 return;
             }
 
-            throw new CSVMergeException("Can't merge the CSVs. Headers are different.");
-        }
-
-        $this->headerAlreadyWritten = true;
-    }
-
-    private function processCSVValidation($firstHandle, $secondHandle): bool {
-        try {
-            $this->validateCSV($firstHandle, $secondHandle);
-            return true;
-        } catch (CSVMergeException $e) {
-            echo $e->getMessage();
-            return false;
+            throw new DataTableMergeException("Can't merge the data tables. Headers are different.");
         }
     }
 
-    private function flushBuffer($buffer, string $destination): void {
-
-        rewind($buffer);
-        $bufferContent = stream_get_contents($buffer);
-        file_put_contents($destination, $bufferContent, FILE_APPEND | LOCK_EX);
-
-        ftruncate($buffer, 0);
-        rewind($buffer);
-    }
-
-    private function writeRow($buffer, array $row, int $maximumCapacity, string $destination = "public/output.csv"): void {
-
-        fputcsv($buffer, $row,',', '"', '\\');
-        $fileStats = fstat($buffer);
-        if($fileStats['size'] >= $maximumCapacity) {
-            $this->flushBuffer($buffer, $destination);
-        }
-    }
-
-    private function writeFile($handle, $buffer, $maximumCapacity, $destination): void {
-        while(!feof($handle)) {
-            $row = fgetcsv($handle, 0, ',', '"', '\\');
-            if($row === false) break;
-
-            $this->writeRow($buffer, $row, $maximumCapacity, $destination);
-        }
-
-        $this->flushBuffer($buffer, $destination);
-    }
-
-    public function execute(DataTable $initialData): DataTable
+    public function execute(DataTableInterface $initialData): DataTableInterface
     {
+        try {
+            $firstFileFirstLine = $initialData->getRows()->current();
+            $secondFileFirstLine = $this->dataTable->getRows()->current();
 
-        if(!$this->processCSVValidation($initialFileHandle, $secondFileHandle)) {
-            fclose($initialFileHandle);
-            fclose($secondFileHandle);
-            return;
+            $this->validateCSV($firstFileFirstLine->getKeys(), $secondFileFirstLine->getKeys());
+        } catch (DataTableMergeException $e) {
+            echo $e->getMessage() . PHP_EOL;
+            exit;
         }
 
-        rewind($initialFileHandle);
-        if(!$this->headerAlreadyWritten) {
-            rewind($secondFileHandle);
-        }
+        $mergedDataTable = new MergedLazyDataTable();
 
-        $tempMemory = $options[1] *  1024 * 1024 ?? 8 * 1024 * 1024;
+        $mergedDataTable->addSubTable($initialData);
+        $mergedDataTable->addSubTable($this->dataTable);
 
-        $destinationHandle = fopen($destination, 'w');
-        ftruncate($destinationHandle, 0);
-        rewind($destinationHandle);
-        fclose($destinationHandle);
-
-        $buffer = fopen("php://temp/maxmemory:$tempMemory", "w+");
-        $this->writeFile($initialFileHandle, $buffer, $tempMemory, $destination);
-
-        ftruncate($buffer, 0);
-        rewind($buffer);
-
-        $this->writeFile($secondFileHandle,  $buffer, $tempMemory, $destination);
-
-        fclose($initialFileHandle);
-        fclose($secondFileHandle);
-
+        return $mergedDataTable;
     }
 }
