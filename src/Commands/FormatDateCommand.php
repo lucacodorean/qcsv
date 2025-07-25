@@ -5,6 +5,7 @@ namespace Src\Commands;
 use Carbon\Carbon;
 use Carbon\Exceptions\InvalidFormatException;
 use Src\Domain\CsvFile;
+use Src\Domain\DataTable;
 use Src\Domain\Row;
 use Src\Exceptions\InvalidParametersException;
 use Src\Services\StreamerService;
@@ -14,8 +15,7 @@ use Src\Utils\HeaderWorker;
 readonly class ReformatDateCSVCommand implements Command {
 
     public function __construct(
-        private StreamerService $streamerService,
-        private WriterService $writerService,
+            private string $format
     ) {
         //
     }
@@ -44,7 +44,7 @@ readonly class ReformatDateCSVCommand implements Command {
         return $date->format($format);
     }
 
-    public function execute(string $filepath, string $destination = "public/output.csv", array $options = []): void
+    public function execute(DataTable $initialData): DataTable
     {
         try {
 

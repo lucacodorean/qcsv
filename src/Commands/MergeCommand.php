@@ -1,16 +1,20 @@
 <?php
 
 namespace Src\Commands;
+
+use Ds\Vector;
+use Src\Domain\DataTable;
 use Src\Exceptions\CSVMergeException;
 use Src\Utils\HeaderWorker;
 
 class MergeCSVCommand implements Command {
 
-    private bool $headerAlreadyWritten;
 
-    public function __construct()
-    {
-        $this->headerAlreadyWritten = false;
+    public function __construct(
+        private Ds\Vector $dataTables,
+        private bool $headerAlreadyWritten = false
+    ) {
+        ///
     }
 
     /**
@@ -81,14 +85,8 @@ class MergeCSVCommand implements Command {
         $this->flushBuffer($buffer, $destination);
     }
 
-    public function execute(string $filepath, string $destination = "public/output.csv", array $options = []): void
+    public function execute(DataTable $initialData): DataTable
     {
-        $initialFileHandle = fopen($filepath, 'r');
-        $secondFileHandle = fopen($options[0], 'r');
-        if($initialFileHandle === false || $secondFileHandle === false) {
-            echo "Can't open the one of the input files." . PHP_EOL;
-            return;
-        }
 
         if(!$this->processCSVValidation($initialFileHandle, $secondFileHandle)) {
             fclose($initialFileHandle);
@@ -96,38 +94,12 @@ class MergeCSVCommand implements Command {
             return;
         }
 
-        echo "Merging the CSVs at paths $filepath and $options[0]." . PHP_EOL;
-
-        /// This approach is good in case the script is run from the terminal.
-        /// It doesn't even need to have the files open.
-
-        /// Is this a good approach in case the command is run from web?
-        /// Security concerns?
-        //exec("cat $filepath > $destination", $output, $returnedCode);
-        //exec("cat $options[0] >> $destination", $output, $returnedCode);
-
-        ///Would using file_put_contents and file_get_contents be a better approach?
-        /// This would store the contents of both files in memory. and in case a CSV is huge, then the used memory
-        /// would be also huge.
-
-        /// $firstFileContents = file_get_contents($filepath);
-        /// $secondFileContents = file_get_contents($options[0]);
-        /// $firstFileContents .= $secondFileContents;
-
-        /// file_put_contents($destination, $firstFileContents);
-
-
-        /// Another idea would be to use a temporary file that has a fixed size, and whenever the maximum size is reached
-        /// we just write it into the destination and flush its content. This brings a bit of extra logic for checking
-        /// if the temp file accommodates the current line.
-        /// The used memory is constant. The execution time is dependent on the size of the temp file.
-
         rewind($initialFileHandle);
         if(!$this->headerAlreadyWritten) {
             rewind($secondFileHandle);
         }
 
-        $tempMemory = $options[1] * 1 ?? 8 * 1024 * 1024;
+        $tempMemory = $options[1] *  1024 * 1024 ?? 8 * 1024 * 1024;
 
         $destinationHandle = fopen($destination, 'w');
         ftruncate($destinationHandle, 0);

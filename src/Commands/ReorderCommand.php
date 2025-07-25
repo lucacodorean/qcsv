@@ -13,8 +13,7 @@ use Src\Utils\HeaderWorker;
 readonly class ReorderCSVCommand implements Command {
 
     public function __construct(
-        private StreamerService $streamerService,
-        private WriterService   $writerService,
+        private string $headerLine
     ) {
         //
     }
