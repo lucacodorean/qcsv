@@ -3,16 +3,41 @@
 require __DIR__ . '/vendor/autoload.php';
 
 use Src\CommandRunner;
-use Src\Services\CsvWriterService;
-use Src\Utils\ArgsParser;
-use Src\Services\CsvGeneratorService;
+use Src\Input\CommandInput;
+use Src\Services\ReadServiceImpl;
+use Src\Services\WriteServiceImpl;
 
 try {
-    $arguments = ArgsParser::parseArgs();
+    $commandInput = CommandInput::fromOpt();
 
-    $runner = new CommandRunner(new CsvGeneratorService(), new CsvWriterService());
-    $runner->attachCommand($arguments["command"]);
-    $runner->run($arguments["sourcePath"], $arguments["destinationPath"], $arguments["options"]);
+    if($commandInput->getCommand() == "merge") {
+
+        $streams[] = $commandInput->getInputStream();
+        $streams = array_merge($streams, explode(',' , $commandInput->getOptions()[0]));
+
+        for($i = 0; $i < count($streams)-1; $i++) {
+            $mergeCommand = CommandInput::fromCascade(
+                $commandInput->getCommand(),
+                $streams[$i],
+                $commandInput->getDestinationStream(),
+                [$streams[$i+1]]
+            );
+
+            new CommandRunner(
+                new ReadServiceImpl(),
+                new WriteServiceImpl()
+            )->run($mergeCommand);
+        }
+
+        return;
+
+    }
+
+    new CommandRunner(
+        new ReadServiceImpl(),
+        new WriteServiceImpl()
+    )->run($commandInput);
+
 
 } catch (InvalidArgumentException|Exception $e) {
     echo $e->getMessage() . PHP_EOL;
