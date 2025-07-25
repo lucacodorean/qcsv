@@ -25,22 +25,56 @@ final class Row {
         }
 
         $this->fields = new Map;
-        if(!empty($headers)) {
-            foreach ($headers as $i => $headerTag) {
-                $this->fields->put($headerTag, $values[$i]);
-            }
-        }
-
-        else {
-            foreach ($values as $key => $value) {
-                $this->fields->put($key, $value);
-            }
+        foreach ($values as $key => $value) {
+            $this->fields->put($headers[$key], $value);
         }
     }
 
-    public function set(string $key, string $value): void {
+    /**
+     * @throws InvalidParametersException
+     */
+    public static function fromMap(Map $map): self {
+        return new self($map->values()->toArray(), $map->keys()->toArray());
+    }
+
+    public function get(string|int $key): string {
+        return $this->fields->get($key);
+    }
+
+    public function set(string|int $key, string $value): void {
         $this->fields->put($key, $value);
     }
+
+    public function find(string|int $key): Row {
+        foreach ($this->fields as $field) {
+            echo $field . PHP_EOL;
+        }
+
+        return $this;
+    }
+
+    public function getValues(): array {
+        return $this->fields->values()->toArray();
+    }
+
+    public function getKeys(): array {
+        return $this->fields->keys()->toArray();
+    }
+
+    public function printKeys(): void {
+        foreach ($this->fields as $key => $field) {
+            echo  " $key => $field" . PHP_EOL;
+        }
+    }
+
+    public function toArray(): array {
+        return $this->fields->toArray();
+    }
+
+    public function remove(string|int $key): void {
+        $this->fields->remove($key);
+    }
+
 
     public function __toString(): string
     {

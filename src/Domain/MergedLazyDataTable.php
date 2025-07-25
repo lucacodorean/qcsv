@@ -1,0 +1,26 @@
+<?php
+
+namespace Src\Domain;
+
+use Generator;
+use Ds\Vector;
+
+class MergedLazyDataTable implements DataTableInterface {
+
+    private Vector $subTables;
+
+    public function __construct(
+    ) {
+        $this->subTables = new Vector;
+    }
+
+    public function getRows(): Generator {
+        foreach ($this->subTables as $subTable) {
+            yield from $subTable->getRows();
+        }
+    }
+
+    public function addSubTable(DataTableInterface $subTable): void {
+        $this->subTables->push($subTable);
+    }
+}
