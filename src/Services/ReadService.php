@@ -2,9 +2,11 @@
 
 namespace Src\Services;
 
-use Src\Domain\DataTable;
+use Generator;
+use Src\Domain\DataTableInterface;
 
 interface ReadService
 {
-    public function read(string $stream): DataTable;
+    public function read(string $stream): DataTableInterface;
+    public function lazyRead(string $stream): Generator;
 }

@@ -2,13 +2,28 @@
 
 namespace Src\Services;
 
-use Src\Domain\DataTable;
+use Src\Domain\DataTableInterface;
 
-class StreamWriteService implements WriteService
+class WriteServiceImpl implements WriteService
 {
-    public function toFile(DataTable $table, string $destinationStream): void
+    public function toStream(DataTableInterface $table, string $destinationStream): void
     {
+        $handle = fopen($destinationStream, 'w');
+
+        foreach($table->getRows() as $row) {
+            fwrite($handle, $row);
+        }
+
+        fclose($handle);
+    }
 
 
+    public function lazyToStream(DataTableInterface $table, string $destinationStream): void {
+
+        $handle = fopen($destinationStream, 'a');
+        foreach ($table->getRows() as $row) {
+            fwrite($handle, $row);
+        }
+        fclose($handle);
     }
 }
