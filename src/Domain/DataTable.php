@@ -4,7 +4,7 @@ namespace Src\Domain;
 
 use Ds\Vector;
 
-class DataTable implements 
+class DataTable implements DataTableInterface
 {
     private Vector $rows;
     public function __construct(){

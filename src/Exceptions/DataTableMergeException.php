@@ -3,7 +3,7 @@
 namespace Src\Exceptions;
 use Exception;
 
-class CSVMergeException extends Exception {
+class DataTableMergeException extends Exception {
     public function __construct(
         string $message,
         private readonly array $errors = []
