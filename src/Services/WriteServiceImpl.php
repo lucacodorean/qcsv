@@ -20,7 +20,7 @@ class WriteServiceImpl implements WriteService
 
     public function lazyToStream(DataTableInterface $table, string $destinationStream): void {
 
-        $handle = fopen($destinationStream, 'a');
+        $handle = fopen($destinationStream, 'w');
         foreach ($table->getRows() as $row) {
             fwrite($handle, $row);
         }

@@ -1,8 +1,9 @@
 <?php
 
 namespace Src\Commands;
+use Src\Domain\DataTable;
 use Src\Domain\DataTableInterface;
-use Src\Domain\MergedLazyDataTable;
+use Src\Domain\Row;
 use Src\Exceptions\DataTableMergeException;
 use Src\Utils\HeaderWorker;
 
@@ -10,6 +11,7 @@ class MergeCommand implements Command {
 
     public function __construct(
         private DataTableInterface $dataTable,
+        private Row $firstLineFirstFile,
     )
     {
 
@@ -36,23 +38,15 @@ class MergeCommand implements Command {
         }
     }
 
-    public function execute(DataTableInterface $initialData): DataTableInterface
-    {
+    public function execute(DataTableInterface $initialData): DataTableInterface {
         try {
-            $firstFileFirstLine = $initialData->getRows()->current();
-            $secondFileFirstLine = $this->dataTable->getRows()->current();
-
-            $this->validateCSV($firstFileFirstLine->getKeys(), $secondFileFirstLine->getKeys());
+            $currentFilFirstFile = $initialData->getRows()->current();
+            $this->validateCSV($currentFilFirstFile->toArray(), $this->firstLineFirstFile->toArray());
+            return $initialData;
         } catch (DataTableMergeException $e) {
-            echo $e->getMessage() . PHP_EOL;
-            exit;
+            echo $e->getMessage();
         }
 
-        $mergedDataTable = new MergedLazyDataTable();
-
-        $mergedDataTable->addSubTable($initialData);
-        $mergedDataTable->addSubTable($this->dataTable);
-
-        return $mergedDataTable;
+        return new DataTable();
     }
 }

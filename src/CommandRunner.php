@@ -6,17 +6,18 @@ use Carbon\Carbon;
 use Carbon\Exceptions\InvalidFormatException;
 use Src\Commands\Command;
 use Src\Commands\IndexCommand;
-use Src\Commands\MergeCommand;
+use Src\Commands\MergeCommandLauncher;
 use Src\Commands\PrependCommand;
 use Src\Commands\FormatDateCommand;
 use Src\Commands\RemoveCommand;
 use Src\Commands\ReorderCommand;
 use Src\Commands\TruncateCommand;
 use Src\Domain\LazyDataTable;
-use Src\Domain\MergedLazyDataTable;
 use Src\Input\CommandInput;
 use Src\Services\ReadService;
 use Src\Services\WriteService;
+
+use Ds\Vector;
 
 class CommandRunner
 {
@@ -77,9 +78,12 @@ class CommandRunner
                 $this->command = new FormatDateCommand($format);
                 break;
             case "merge":
-                $streamPath = $input->getOptions()[0];
-                $secondFile = new LazyDataTable($this->readStream->lazyRead($streamPath), $streamPath);
-                $this->command = new MergeCommand($secondFile);
+                $streams = explode(',' , $input->getOptions()[0]);
+                $vector = new Vector;
+                foreach($streams as $stream) {
+                    $vector->push(new LazyDataTable($this->readStream->lazyRead($stream)));
+                }
+                $this->command = new MergeCommandLauncher($vector);
                 break;
             default:
                 echo "Given command is not implemented (at least yet).";
@@ -94,7 +98,7 @@ class CommandRunner
 
         $initialData = $input->getCommand() != "merge" ?
             $this->readStream->read($inputStream) :
-            new LazyDataTable($this->readStream->lazyRead($inputStream), $inputStream);
+            new LazyDataTable($this->readStream->lazyRead($inputStream));
 
         $resultData = $this->command->execute($initialData);
 
