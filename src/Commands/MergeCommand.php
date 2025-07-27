@@ -10,7 +10,6 @@ use Src\Utils\HeaderWorker;
 class MergeCommand implements Command {
 
     public function __construct(
-        private DataTableInterface $dataTable,
         private Row $firstLineFirstFile,
     )
     {

@@ -2,6 +2,7 @@
 
 namespace Src\Commands;
 
+use Src\Domain\DataTable;
 use Src\Domain\DataTableInterface;
 use Ds\Map;
 use Src\Domain\Row;
@@ -19,7 +20,7 @@ readonly class ReorderCommand implements Command {
     {
 
         try {
-            $newTable = new DataTableInterface();
+            $newTable = new DataTable();
             foreach ($initialData->getRows() as $row) {
                 $orderedRow = new Map;
 

@@ -22,7 +22,7 @@ class MergeCommandLauncher implements Command {
 
         foreach ($this->secondaryDataTable as $secondaryDataTable) {
             $result->addSubTable(
-                new MergeCommand($initialData, $firstLine)->execute($secondaryDataTable)
+                new MergeCommand($firstLine)->execute($secondaryDataTable)
             );
         }
 
