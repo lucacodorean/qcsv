@@ -5,6 +5,8 @@ namespace Src;
 use Carbon\Carbon;
 use Carbon\Exceptions\InvalidFormatException;
 use Src\Commands\Command;
+use Src\Commands\DecryptCommand;
+use Src\Commands\EncryptCommand;
 use Src\Commands\IndexCommand;
 use Src\Commands\MergeCommandLauncher;
 use Src\Commands\PrependCommand;
@@ -12,6 +14,7 @@ use Src\Commands\FormatDateCommand;
 use Src\Commands\RemoveCommand;
 use Src\Commands\ReorderCommand;
 use Src\Commands\TruncateCommand;
+use Src\Domain\EncryptedDataTable;
 use Src\Domain\LazyDataTable;
 use Src\Input\CommandInput;
 use Src\Services\ReadService;
@@ -85,6 +88,19 @@ class CommandRunner
                 }
                 $this->command = new MergeCommandLauncher($vector);
                 break;
+            case "encrypt":
+                $columns = explode(',' , $input->getOptions()[0]);
+
+                $privateKey = $this->readStream->readEncryptionKey($input->getPrivateKeyStream());
+
+                $this->command = new EncryptCommand($privateKey, $columns);
+                break;
+            case "decrypt":
+                $columns = explode(',' , $input->getOptions()[0]);
+                $publicKey = $this->readStream->readEncryptionKey($input->getPublicKeyStream());
+
+                $this->command = new DecryptCommand($publicKey, $columns);
+                break;
             default:
                 echo "Given command is not implemented (at least yet).";
                 exit;
@@ -105,5 +121,8 @@ class CommandRunner
         $input->getCommand() != "merge" ?
             $this->writeService->toStream($resultData, $input->getDestinationStream()) :
             $this->writeService->lazyToStream($resultData, $input->getDestinationStream());
+
+        if($input->getCommand() == "encrypt" && $resultData instanceof EncryptedDataTable)
+            $this->writeService->displayEncryptionPublicKey($resultData, $input->getPublicKeyStream());
     }
 }

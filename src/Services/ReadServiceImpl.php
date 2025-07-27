@@ -60,18 +60,25 @@ class ReadServiceImpl implements ReadService
             $headers = range(0, count($firstLine) - 1);
         }
 
+        while(!feof($handle)) {
+            $line = fgetcsv($handle,0, ',', '"', '\\');
+            if(!$line) continue;
 
-        if (flock($handle, LOCK_SH)) {
-            while(!feof($handle)) {
-                $line = fgetcsv($handle,0, ',', '"', '\\');
-                if(!$line) continue;
-
-                yield new Row($line, $headers);
-            }
-            flock($handle, LOCK_UN);
-        } else {
-            throw new RuntimeException("Unable to acquire shared lock");
+            yield new Row($line, $headers);
         }
         fclose($handle);
+    }
+
+    public function readEncryptionKey(string $stream): string
+    {
+        $handle = fopen($stream, 'r');
+        if($handle === false) {
+            echo "Could not open stream $stream" . PHP_EOL;
+            exit;
+        }
+
+        $result = stream_get_contents($handle);
+        fclose($handle);
+        return $result;
     }
 }

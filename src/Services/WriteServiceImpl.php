@@ -3,6 +3,7 @@
 namespace Src\Services;
 
 use Src\Domain\DataTableInterface;
+use Src\Domain\EncryptedDataTable;
 
 class WriteServiceImpl implements WriteService
 {
@@ -24,6 +25,12 @@ class WriteServiceImpl implements WriteService
         foreach ($table->getRows() as $row) {
             fwrite($handle, $row);
         }
+        fclose($handle);
+    }
+
+    public function displayEncryptionPublicKey(EncryptedDataTable $table, string $destinationStream): void {
+        $handle = fopen($destinationStream, 'w');
+        fwrite($handle, $table->getPublicKey());
         fclose($handle);
     }
 }

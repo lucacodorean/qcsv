@@ -24,9 +24,10 @@ final class Row {
             throw new InvalidParametersException("Given values count don't match the header count.");
         }
 
+
         $this->fields = new Map;
         foreach ($values as $key => $value) {
-            $this->fields->put($headers[$key], $value);
+            $this->fields->put(trim($headers[$key]), trim($value));
         }
     }
 

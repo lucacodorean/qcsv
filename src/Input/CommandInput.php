@@ -8,14 +8,16 @@ readonly class CommandInput {
         private string $command,
         private string $inputStream,
         private string $destinationStream,
-        private array $options = []
+        private array $options = [],
+        private string $publicKeyStream = "",
+        private string $privateKeyStream = "",
     ) {
         ///
     }
 
     public static function fromOpt() : self {
-        $shortOpts = "s:d:c:op::";
-        $longOpts = ["source:", "destination:", "command:","options::"];
+        $shortOpts = "s:d:c:op::pubk::privk::";
+        $longOpts = ["source:", "destination:", "command:","options::", "public_key_path::", "private_key_path::"];
 
         $parsedArguments = getopt($shortOpts, $longOpts);
 
@@ -23,16 +25,22 @@ readonly class CommandInput {
         if(isset($parsedArguments['options'])) $options[] = $parsedArguments['options'];
         if(isset($parsedArguments['o'])) $options[] = $parsedArguments['o'];
 
+        $publicKeyStream = "";
+        if(isset($parsedArguments['public_key_path'])) $publicKeyStream = $parsedArguments['public_key_path'];
+        else if(isset($parsedArguments['pubk'])) $publicKeyStream = $parsedArguments['pubk'];
+
+        $privateKeyStream = "";
+        if(isset($parsedArguments['private_key_path'])) $privateKeyStream = $parsedArguments['private_key_path'];
+        else if(isset($parsedArguments['privk'])) $privateKeyStream = $parsedArguments['privk'];
+
         return new self(
             $parsedArguments["command"] ?? $parsedArguments["c"],
         $parsedArguments["source"] ?? $parsedArguments["s"],
                 $parsedArguments["destination"] ?? $parsedArguments["e"],
-                $options
+                $options,
+                $publicKeyStream,
+            $privateKeyStream
         );
-    }
-
-    public static function fromCascade(string $command, string $inputStream, string $outputStream, array $options = []): self {
-        return new self($command, $inputStream, $outputStream, $options);
     }
 
     public function getInputStream(): string {
@@ -49,5 +57,14 @@ readonly class CommandInput {
 
     public function getCommand(): string {
         return $this->command;
+    }
+
+    public function getPublicKeyStream(): string {
+        return $this->publicKeyStream;
+    }
+
+    public function getPrivateKeyStream(): string
+    {
+        return $this->privateKeyStream;
     }
 }
