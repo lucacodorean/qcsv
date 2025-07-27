@@ -6,6 +6,10 @@ use Src\CommandRunner;
 use Src\Input\CommandInput;
 use Src\Services\ReadServiceImpl;
 use Src\Services\WriteServiceImpl;
+use Symfony\Component\Dotenv\Dotenv;
+
+$dotenv = new Dotenv();
+$dotenv->load(__DIR__ . '/.env');
 
 try {
     $commandInput = CommandInput::fromOpt();
