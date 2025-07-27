@@ -16,8 +16,8 @@ readonly class CommandInput {
     }
 
     public static function fromOpt() : self {
-        $shortOpts = "s:d:c:op::pubk::privk::";
-        $longOpts = ["source:", "destination:", "command:","options::", "public_key_path::", "private_key_path::"];
+        $shortOpts = "s::d::c:op::pubk::privk::";
+        $longOpts = ["source::", "destination::", "command:","options::", "public_key_path::", "private_key_path::"];
 
         $parsedArguments = getopt($shortOpts, $longOpts);
 
@@ -35,8 +35,8 @@ readonly class CommandInput {
 
         return new self(
             $parsedArguments["command"] ?? $parsedArguments["c"],
-        $parsedArguments["source"] ?? $parsedArguments["s"],
-                $parsedArguments["destination"] ?? $parsedArguments["e"],
+        $parsedArguments["source"] ?? $parsedArguments["s"] ?? "" ,
+                $parsedArguments["destination"] ?? $parsedArguments["e"] ?? "",
                 $options,
                 $publicKeyStream,
             $privateKeyStream

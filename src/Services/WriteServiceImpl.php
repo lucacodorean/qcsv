@@ -28,9 +28,9 @@ class WriteServiceImpl implements WriteService
         fclose($handle);
     }
 
-    public function displayEncryptionPublicKey(EncryptedDataTable $table, string $destinationStream): void {
+    public function passMessage(string $message, string $destinationStream): void {
         $handle = fopen($destinationStream, 'w');
-        fwrite($handle, $table->getPublicKey());
+        fwrite($handle, $message);
         fclose($handle);
     }
 }
