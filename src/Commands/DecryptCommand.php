@@ -8,7 +8,7 @@ use Src\Utils\HeaderWorker;
 readonly class DecryptCommand implements Command
 {
     public function __construct(
-        private string $publicKey,
+        private string $privateKey,
         private array $encryptedColumns
     ) {
         ///
@@ -25,7 +25,7 @@ readonly class DecryptCommand implements Command
             }
 
             foreach($this->encryptedColumns as $currentEncryptedColumn) {
-                $status = openssl_public_decrypt(base64_decode($currentRow->get($currentEncryptedColumn)), $decrypted, $this->publicKey);
+                $status = openssl_private_decrypt(base64_decode($currentRow->get($currentEncryptedColumn)), $decrypted, $this->privateKey);
                 if(!$status) {
                     echo "There was an error at decrypting. Given public key may be invalid";
                     exit;

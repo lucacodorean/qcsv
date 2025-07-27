@@ -8,10 +8,10 @@ use Src\Domain\EncryptedDataTable;
 use Src\Domain\Row;
 use Src\Utils\HeaderWorker;
 
-class EncryptCommand implements Command
+readonly class EncryptCommand implements Command
 {
     public function __construct(
-        private string $privateKey,
+        private string $publicKey,
         private array $encryptionColumns,
     )
     {
@@ -27,11 +27,6 @@ class EncryptCommand implements Command
             }
         }
 
-        $privateKeyPKey = openssl_pkey_get_private($this->privateKey);
-        $keyDetails = openssl_pkey_get_details($privateKeyPKey);
-
-        $publicKeyPem = $keyDetails['key'];
-
         $dataTable = new DataTable;
         $dataTable->append(new Row($firstLine, $firstLine));
 
@@ -44,12 +39,12 @@ class EncryptCommand implements Command
             }
 
             foreach($this->encryptionColumns as $currentEncryptionColumn) {
-                openssl_private_encrypt($currentRow->get($currentEncryptionColumn), $encryptedData, $this->privateKey);
+                openssl_public_encrypt($currentRow->get($currentEncryptionColumn), $encryptedData, $this->publicKey);
                 $currentRow->set($currentEncryptionColumn, base64_encode($encryptedData));
             }
 
         }
-        return  new EncryptedDataTable($initialData, $publicKeyPem);
+        return  new EncryptedDataTable($initialData, $this->publicKey);
     }
 
 }

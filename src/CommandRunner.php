@@ -90,16 +90,15 @@ class CommandRunner
                 break;
             case "encrypt":
                 $columns = explode(',' , $input->getOptions()[0]);
+                $publicKey = $this->readStream->readEncryptionKey($input->getPublicKeyStream());
 
-                $privateKey = $this->readStream->readEncryptionKey($input->getPrivateKeyStream());
-
-                $this->command = new EncryptCommand($privateKey, $columns);
+                $this->command = new EncryptCommand($publicKey, $columns);
                 break;
             case "decrypt":
                 $columns = explode(',' , $input->getOptions()[0]);
-                $publicKey = $this->readStream->readEncryptionKey($input->getPublicKeyStream());
+                $privateKey = $this->readStream->readEncryptionKey($input->getPrivateKeyStream());
 
-                $this->command = new DecryptCommand($publicKey, $columns);
+                $this->command = new DecryptCommand($privateKey, $columns);
                 break;
             default:
                 echo "Given command is not implemented (at least yet).";
