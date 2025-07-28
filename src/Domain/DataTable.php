@@ -4,7 +4,7 @@ namespace Src\Domain;
 
 use Ds\Vector;
 
-class DataTable implements DataTableInterface
+class DataTable extends HeaderedDataTable implements DataTableInterface
 {
     private Vector $rows;
     public function __construct(){
@@ -17,6 +17,10 @@ class DataTable implements DataTableInterface
 
     public function getRows(): Vector {
         return $this->rows;
+    }
+
+    public function getHeader(): array {
+        return $this->rows->first()->getKeys();
     }
 
     public function prepend(Row $row): void {

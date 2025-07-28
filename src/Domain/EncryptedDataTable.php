@@ -18,6 +18,14 @@ readonly class EncryptedDataTable implements DataTableInterface {
         return $this->dataTable->getRows();
     }
 
+    public function getHeader(): array {
+        return $this->dataTable->getHeader();
+    }
+
+    public function hasHeader(): bool {
+        return $this->dataTable->hasHeader();
+    }
+
     public function getPublicKey(): string {
         return $this->publicKey;
     }

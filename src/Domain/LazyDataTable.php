@@ -3,12 +3,16 @@
 namespace Src\Domain;
 
 use Generator;
-class LazyDataTable implements DataTableInterface {
+class LazyDataTable extends HeaderedDataTable implements DataTableInterface {
 
     public function __construct(
         private Generator $generator,
     ) {
         ///
+    }
+
+    public function getHeader(): array {
+        return $this->generator->current()->getKeys();
     }
 
     public function getRows(): Generator {

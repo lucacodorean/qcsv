@@ -1,6 +1,6 @@
 <?php
 
-namespace Src\Services;
+namespace Src\Services\IO;
 
 use Generator;
 use Src\Domain\DataTableInterface;

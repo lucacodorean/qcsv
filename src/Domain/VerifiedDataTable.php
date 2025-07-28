@@ -6,11 +6,11 @@ use Generator;
 use Ds\Vector;
 use Src\Enums\DataTableStatusEnum;
 
-readonly class VerifiedDataTable implements DataTableInterface
+class VerifiedDataTable extends HeaderedDataTable implements DataTableInterface
 {
     private function __construct(
-        private DataTableInterface $dataTable,
-        private DataTableStatusEnum $status
+        private readonly DataTableInterface $dataTable,
+        private readonly DataTableStatusEnum $status
     )
     {
         ///
@@ -22,6 +22,10 @@ readonly class VerifiedDataTable implements DataTableInterface
 
     public function getRows(): Vector|Generator {
         return $this->dataTable->getRows();
+    }
+
+    public function getHeader() : array {
+        return $this->dataTable->getHeader();
     }
 
     public function getStatus(): DataTableStatusEnum {
