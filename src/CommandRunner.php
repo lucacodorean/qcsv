@@ -4,13 +4,14 @@ namespace Src;
 
 use Carbon\Carbon;
 use Carbon\Exceptions\InvalidFormatException;
+use Ds\Vector;
 use Src\Commands\Command;
 use Src\Commands\DecryptCommand;
 use Src\Commands\EncryptCommand;
+use Src\Commands\FormatDateCommand;
 use Src\Commands\IndexCommand;
 use Src\Commands\MergeCommandLauncher;
 use Src\Commands\PrependCommand;
-use Src\Commands\FormatDateCommand;
 use Src\Commands\RemoveCommand;
 use Src\Commands\ReorderCommand;
 use Src\Commands\SignCommand;
@@ -20,10 +21,8 @@ use Src\Domain\EncryptedDataTable;
 use Src\Domain\LazyDataTable;
 use Src\Domain\VerifiedDataTable;
 use Src\Input\CommandInput;
-use Src\Services\ReadService;
-use Src\Services\WriteService;
-
-use Ds\Vector;
+use Src\Services\IO\ReadService;
+use Src\Services\IO\WriteService;
 
 class CommandRunner
 {
@@ -142,9 +141,7 @@ class CommandRunner
 
         $resultData = $this->command->execute($initialData);
 
-        $input->getCommand() != "merge" ?
-            $this->writeService->toStream($resultData, $input->getDestinationStream()) :
-            $this->writeService->lazyToStream($resultData, $input->getDestinationStream());
+        $this->writeService->toStream($resultData, $input->getDestinationStream());
 
         if($input->getCommand() == "encrypt" && $resultData instanceof EncryptedDataTable)
             $this->writeService->passMessage($resultData->getPublicKey(), $input->getPublicKeyStream());

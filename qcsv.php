@@ -4,8 +4,8 @@ require __DIR__ . '/vendor/autoload.php';
 
 use Src\CommandRunner;
 use Src\Input\CommandInput;
-use Src\Services\ReadServiceImpl;
-use Src\Services\WriteServiceImpl;
+use Src\Services\IO\ReadServiceImpl;
+use Src\Services\IO\WriteServiceImpl;
 use Symfony\Component\Dotenv\Dotenv;
 
 $dotenv = new Dotenv();
