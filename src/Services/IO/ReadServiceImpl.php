@@ -28,7 +28,8 @@ class ReadServiceImpl implements ReadService
                 echo "No headers for the stream $stream. Setting index-based." . PHP_EOL;
                 $headers = range(0, count($firstLine) - 1);
             }
-            $output->append(new Row($headers, $headers));
+
+            $output->append(new Row($firstLine, $headers));
 
             while(!feof($handle)) {
                 $line = fgetcsv($handle,0, ',', '"', '\\');

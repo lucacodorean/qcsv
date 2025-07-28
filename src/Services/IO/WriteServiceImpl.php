@@ -10,11 +10,14 @@ class WriteServiceImpl implements WriteService
     {
         $handle = fopen($destinationStream, 'w');
 
-        if($table->hasHeader())
-            fwrite($handle, implode(",", $table->getHeader()) . PHP_EOL);
+        $hasHeaders = $table->hasHeader();
 
         foreach($table->getRows() as $row) {
-            fwrite($handle, $row);
+            if($hasHeaders) {
+                fwrite($handle, implode(",", $table->getHeader()) . PHP_EOL);
+                $hasHeaders = false;
+            }
+            else fwrite($handle, $row);
         }
 
         fclose($handle);
