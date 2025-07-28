@@ -4,7 +4,6 @@ namespace Src\Commands;
 
 use Src\Domain\DataTable;
 use Src\Domain\DataTableInterface;
-use Src\Utils\HeaderWorker;
 
 class SignCommand implements Command
 {
@@ -17,12 +16,8 @@ class SignCommand implements Command
 
     public function execute(DataTableInterface $initialData): DataTableInterface {
 
-        $firstLine = $initialData->getRows()->first();
-        $hasHeader = HeaderWorker::computeHeader($firstLine->toArray()) != [];
-
+        $hasHeader = $initialData->hasHeader();
         $signedDataTable = new DataTable();
-        $firstLine->set("signed", "signed");
-        $signedDataTable->prepend($firstLine);
 
         foreach($initialData->getRows() as $currentRow) {
             if ($hasHeader) {

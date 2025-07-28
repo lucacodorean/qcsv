@@ -3,7 +3,6 @@
 namespace Src\Commands;
 
 use Src\Domain\DataTableInterface;
-use Src\Utils\HeaderWorker;
 
 readonly class DecryptCommand implements Command
 {
@@ -15,9 +14,7 @@ readonly class DecryptCommand implements Command
     }
 
     public function execute(DataTableInterface $initialData): DataTableInterface {
-        $firstLine = $initialData->getRows()->first()->toArray();
-        $hasHeader = HeaderWorker::computeHeader($firstLine) != [];
-
+        $hasHeader = $initialData->hasHeader();
         foreach($initialData->getRows() as $currentRow) {
             if($hasHeader) {
                 $hasHeader = false;

@@ -15,7 +15,7 @@ readonly class RemoveCommand implements Command {
 
     public function execute(DataTableInterface $initialData): DataTableInterface
     {
-        $firstLine = $initialData->getRows()->first()->toArray();
+        $firstLine = $initialData->getHeader();
         $keyToBeRemoved = ParameterConverter::setProperIdentifier($firstLine, $this->columnIdentifier);
 
         foreach($initialData->getRows() as $row) {

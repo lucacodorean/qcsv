@@ -5,7 +5,6 @@ namespace Src\Commands;
 use Src\Domain\DataTableInterface;
 use Src\Domain\VerifiedDataTable;
 use Src\Enums\DataTableStatusEnum;
-use Src\Utils\HeaderWorker;
 
 class VerifySignCommand implements Command
 {
@@ -17,8 +16,7 @@ class VerifySignCommand implements Command
     }
 
     public function execute(DataTableInterface $initialData): DataTableInterface {
-        $firstLine = $initialData->getRows()->first();
-        $hasHeader = HeaderWorker::computeHeader($firstLine->toArray()) != [];
+        $hasHeader = $initialData->hasHeader();
         $publicKey = openssl_pkey_get_public($this->publicKeyPem);
 
         foreach($initialData->getRows() as $currentRow) {

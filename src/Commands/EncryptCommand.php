@@ -2,11 +2,8 @@
 
 namespace Src\Commands;
 
-use Src\Domain\DataTable;
 use Src\Domain\DataTableInterface;
 use Src\Domain\EncryptedDataTable;
-use Src\Domain\Row;
-use Src\Utils\HeaderWorker;
 
 readonly class EncryptCommand implements Command
 {
@@ -19,7 +16,7 @@ readonly class EncryptCommand implements Command
     }
 
     public function execute(DataTableInterface $initialData): DataTableInterface {
-        $firstLine = $initialData->getRows()->first()->toArray();
+        $firstLine = $initialData->getHeader();
         foreach ($this->encryptionColumns as $currentEncryptedColumn) {
             if(!array_search($currentEncryptedColumn, $firstLine)) {
                 echo "Can't find the given column in the table.";
@@ -27,10 +24,7 @@ readonly class EncryptCommand implements Command
             }
         }
 
-        $dataTable = new DataTable;
-        $dataTable->append(new Row($firstLine, $firstLine));
-
-        $hasHeader = HeaderWorker::computeHeader($firstLine) != [];
+        $hasHeader = $initialData->hasHeader();
 
         foreach ($initialData->getRows() as $currentRow) {
             if($hasHeader) {
@@ -44,7 +38,7 @@ readonly class EncryptCommand implements Command
             }
 
         }
-        return  new EncryptedDataTable($initialData, $this->publicKey);
+        return new EncryptedDataTable($initialData, $this->publicKey);
     }
 
 }

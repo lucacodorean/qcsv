@@ -11,7 +11,7 @@ readonly class IndexCommand implements Command {
 
     public function execute(DataTableInterface $initialData): DataTableInterface
     {
-        $index = 0;
+        $index = 1;
         foreach ($initialData->getRows() as $row) {
             $row->set("id", $index++);
         }
