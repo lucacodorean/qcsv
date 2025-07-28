@@ -10,6 +10,7 @@ use Src\Commands\DecryptCommand;
 use Src\Commands\EncryptCommand;
 use Src\Commands\FormatDateCommand;
 use Src\Commands\IndexCommand;
+use Src\Commands\JoinCommand;
 use Src\Commands\MergeCommandLauncher;
 use Src\Commands\PrependCommand;
 use Src\Commands\RemoveCommand;
@@ -123,6 +124,13 @@ class CommandRunner
                 $publicKey = $this->readStream->readEncryptionKey($input->getPublicKeyStream());
 
                 $this->command = new VerifySignCommand($publicKey, $columns);
+                break;
+
+            case "join":
+
+                $secondDataTable = new LazyDataTable($this->readStream->lazyRead($input->getOptions()[0][0]));
+                [$columnInFirstTable, $columnInSecondTable] = explode(',', $input->getOptions()[0][1], 2);
+                $this->command = new JoinCommand($secondDataTable, $columnInFirstTable, $columnInSecondTable);
                 break;
             default:
                 echo "Given command is not implemented (at least yet).";
