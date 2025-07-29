@@ -24,9 +24,10 @@ class BasicController extends AbstractController {
     /**
      * @throws RandomException
      */
-    #[Route('/go', name: 'redirect')]
-    public function go(): Response {
-        sleep(random_int(1, 3));
+    #[Route('/go/{secondsMultiplier}', name: 'redirect')]
+    public function go(int $secondsMultiplier): Response {
+        $time = $secondsMultiplier * random_int(1, 3);
+        sleep($time);
 
         return $this->redirect(
             $this->homePath,
