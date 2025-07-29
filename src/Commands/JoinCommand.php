@@ -41,13 +41,6 @@ class JoinCommand implements Command
     }
 
     public function execute(DataTableInterface $initialData): DataTableInterface {
-
-        if( !array_search($this->columnInSecondTable, $this->secondTable->getHeader()) ||
-            !array_search($this->columnInFirstTable, $initialData->getHeader())) {
-                echo "Can't find the column in the first table.";
-                exit(1);
-        }
-
         $joinedDataTable = new DataTable;
         $dataFromSecondTable = $this->convertData($this->secondTable);
 

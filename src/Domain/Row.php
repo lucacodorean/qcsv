@@ -3,7 +3,10 @@
 namespace Src\Domain;
 
 use Ds\Map;
+use http\Exception\RuntimeException;
+use Src\Enums\ConditionTypeEnum;
 use Src\Exceptions\InvalidParametersException;
+use Src\Utils\SelectCondition;
 
 
 /// What I'm trying to do here is to get a Row as a well-defined data structure that allows me to iterate
@@ -31,6 +34,40 @@ final class Row {
         }
     }
 
+    public function withColumns(array $keysToSelect): self {
+        $keysToSelect = array_flip($keysToSelect);
+
+        $newFields = $this->fields->copy();
+        foreach ($newFields->keys() as $key) {
+            if (!isset($keysToSelect[$key])) {
+                $newFields->remove($key);
+            }
+        }
+
+        return new self($newFields->values()->toArray(), $newFields->keys()->toArray());
+    }
+
+    public function evaluateCondition(SelectCondition $selectCondition): bool {
+        $valueToBeEvaluated = $this->get($selectCondition->getColumn());
+
+        if (!mb_check_encoding($valueToBeEvaluated, 'UTF-8') && $selectCondition->getConditionType() == ConditionTypeEnum::REGEX) {
+            throw new RuntimeException("Invalid UTF-8 input.");
+        }
+
+
+        return match ($selectCondition->getConditionType()) {
+            ConditionTypeEnum::EQUALS => $valueToBeEvaluated == $selectCondition->getValue(),
+            ConditionTypeEnum::NOT_EQUAL => $valueToBeEvaluated != $selectCondition->getValue(),
+            ConditionTypeEnum::GREATER_THAN => $valueToBeEvaluated > $selectCondition->getValue(),
+            ConditionTypeEnum::LOWER_THAN => $valueToBeEvaluated < $selectCondition->getValue(),
+            ConditionTypeEnum::GREATER_THAN_OR_EQUAL => $valueToBeEvaluated >= $selectCondition->getValue(),
+            ConditionTypeEnum::LOWER_THAN_OR_EQUAL => $valueToBeEvaluated <= $selectCondition->getValue(),
+            ConditionTypeEnum::REGEX =>
+                preg_match("#{$selectCondition->getValue()}#iu", $valueToBeEvaluated) === 1
+        };
+
+    }
+
     /**
      * @throws InvalidParametersException
      */
@@ -46,14 +83,6 @@ final class Row {
         $this->fields->put($key, $value);
     }
 
-    public function find(string|int $key): Row {
-        foreach ($this->fields as $field) {
-            echo $field . PHP_EOL;
-        }
-
-        return $this;
-    }
-
     public function getValues(): array {
         return $this->fields->values()->toArray();
     }
@@ -66,6 +95,10 @@ final class Row {
         foreach ($this->fields as $key => $field) {
             echo  " $key => $field" . PHP_EOL;
         }
+    }
+
+    public function getFields(): Map {
+        return $this->fields;
     }
 
     public function toArray(): array {

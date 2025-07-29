@@ -41,7 +41,23 @@ php ../qcsv.php --source=INPUT_STREAM --command=verify --options=DATA[] --privat
 ```php
 php ../qcsv.php --source=INPUT_STREAM --command=sign --options=DATA[] --public_key_path=PUBLIC_KEY_ORIGIN_STREAM
 ```
+
+#### Joining 
+```php
+php qcsv.php --command=join --options=public/wages.csv --options=id,id_employee | 
+```
+#### Selecting
+```php
+php qcsv.php --command=select --options=id,email,age --options=wage,GREATER_THAN,300
+```
+
 #### Piping operations
 ```php
 php ../qcsv.php --source=../public/employees.csv --command=remove  --options=employee | php ../qcsv.php  --command=format --options=Y/m/d
+
+php qcsv.php --source=public/employees.csv --command=remove  --options=employee | 
+php qcsv.php  --command=format --options=Y/m/d | 
+php qcsv.php --command=join --options=public/wages.csv --options=id,id_employee | 
+php qcsv.php --command=select --options=id,email,age --options=wage,GREATER_THAN,300
+
 ```

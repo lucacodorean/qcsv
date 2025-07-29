@@ -15,6 +15,7 @@ use Src\Commands\MergeCommandLauncher;
 use Src\Commands\PrependCommand;
 use Src\Commands\RemoveCommand;
 use Src\Commands\ReorderCommand;
+use Src\Commands\SelectCommand;
 use Src\Commands\SignCommand;
 use Src\Commands\TruncateCommand;
 use Src\Commands\VerifySignCommand;
@@ -24,6 +25,7 @@ use Src\Domain\VerifiedDataTable;
 use Src\Input\CommandInput;
 use Src\Services\IO\ReadService;
 use Src\Services\IO\WriteService;
+use Src\Utils\SelectCondition;
 
 class CommandRunner
 {
@@ -127,14 +129,29 @@ class CommandRunner
                 break;
 
             case "join":
-
                 $secondDataTable = new LazyDataTable($this->readStream->lazyRead($input->getOptions()[0][0]));
                 [$columnInFirstTable, $columnInSecondTable] = explode(',', $input->getOptions()[0][1], 2);
+
                 $this->command = new JoinCommand($secondDataTable, $columnInFirstTable, $columnInSecondTable);
+                break;
+
+            case "select":
+
+                $columns = [];
+                $conditions = [];
+
+                foreach ($input->getOptions()[0] as $option) {
+                    if($columns == []) {
+                        $columns = explode(',', $option);
+                        continue;
+                    } else $conditions[] = SelectCondition::fromOption($option);
+                }
+
+                $this->command = new SelectCommand($columns, $conditions);
                 break;
             default:
                 echo "Given command is not implemented (at least yet).";
-                exit;
+                exit(1);
         }
     }
 
@@ -157,5 +174,7 @@ class CommandRunner
         if($input->getCommand() == "verify" && $resultData instanceof VerifiedDataTable) {
             $this->writeService->passMessage("Document is {$resultData->getStatus()->value}", $input->getDestinationStream());
         }
+
+        exit(0);
     }
 }
