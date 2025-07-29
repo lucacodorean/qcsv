@@ -9,15 +9,16 @@ class WriteServiceImpl implements WriteService
     public function toStream(DataTableInterface $table, string $destinationStream): void
     {
         $handle = fopen($destinationStream, 'w');
-
         $hasHeaders = $table->hasHeader();
 
-        foreach($table->getRows() as $row) {
+        foreach($table->getIterator() as $row) {
             if($hasHeaders) {
                 fwrite($handle, implode(",", $table->getHeader()) . PHP_EOL);
                 $hasHeaders = false;
+                continue;
             }
-            else fwrite($handle, $row);
+
+            fwrite($handle, $row);
         }
 
         fclose($handle);

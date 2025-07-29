@@ -2,7 +2,11 @@
 
 namespace Src\Commands;
 
+use Src\Domain\DataTable;
 use Src\Domain\DataTableInterface;
+use Src\Domain\VerifiableDataTable;
+use Src\Enums\DataTableStatusEnum;
+use Src\Exceptions\InvalidParametersException;
 
 readonly class DecryptCommand implements Command
 {
@@ -14,24 +18,22 @@ readonly class DecryptCommand implements Command
     }
 
     public function execute(DataTableInterface $initialData): DataTableInterface {
-        $hasHeader = $initialData->hasHeader();
-        foreach($initialData->getRows() as $currentRow) {
-            if($hasHeader) {
-                $hasHeader = false;
-                continue;
-            }
 
+        $decryptedDataTable = new DataTable;
+
+        foreach($initialData->getIterator() as $currentRow) {
+            $newRow = $currentRow->withColumns($initialData->getHeader());
             foreach($this->encryptedColumns as $currentEncryptedColumn) {
-                $status = openssl_private_decrypt(base64_decode($currentRow->get($currentEncryptedColumn)), $decrypted, $this->privateKey);
+                $status = openssl_private_decrypt(base64_decode($newRow->get($currentEncryptedColumn)), $decrypted, $this->privateKey);
                 if(!$status) {
-                    echo "There was an error at decrypting. Given public key may be invalid";
-                    exit;
+                    throw new InvalidParametersException("There was an error at decrypting. Given public key may be invalid");
                 }
 
-                $currentRow->set($currentEncryptedColumn, $decrypted);
+                $newRow->set($currentEncryptedColumn, $decrypted);
+                $decryptedDataTable->append($newRow);
             }
         }
 
-        return $initialData;
+        return VerifiableDataTable::build($decryptedDataTable, DataTableStatusEnum::DECRYPTED);
     }
 }

@@ -6,7 +6,7 @@ use Generator;
 use Ds\Vector;
 use Src\Enums\DataTableStatusEnum;
 
-class VerifiedDataTable extends HeaderedDataTable implements DataTableInterface
+class VerifiableDataTable extends HeaderedDataTable implements DataTableInterface
 {
     private function __construct(
         private readonly DataTableInterface $dataTable,
@@ -17,7 +17,7 @@ class VerifiedDataTable extends HeaderedDataTable implements DataTableInterface
     }
 
     public static function build(DataTableInterface $dataTable, DataTableStatusEnum $status): self {
-        return new VerifiedDataTable($dataTable, $status);
+        return new VerifiableDataTable($dataTable, $status);
     }
 
     public function getRows(): Vector|Generator {

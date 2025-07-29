@@ -31,7 +31,7 @@ class JoinCommand implements Command
     private function convertData(DataTableInterface $dataTable): Map {
 
         $collectedData = new Map;
-        foreach ($dataTable->getRows() as $row) {
+        foreach ($dataTable->getIterator() as $row) {
             $rowArr = $row->toArray();
             unset($rowArr[$this->columnInSecondTable]);
             $collectedData->put($row->get($this->columnInSecondTable), $this->encodeRow($rowArr));
@@ -44,7 +44,7 @@ class JoinCommand implements Command
         $joinedDataTable = new DataTable;
         $dataFromSecondTable = $this->convertData($this->secondTable);
 
-        foreach($initialData->getRows() as $row) {
+        foreach($initialData->getIterator() as $row) {
             if($dataFromSecondTable->hasKey($row->get($this->columnInFirstTable))) {
                 $joiningRowData = $dataFromSecondTable->get($row->get($this->columnInFirstTable));
                 $decoded = $this->decodeRow($joiningRowData);

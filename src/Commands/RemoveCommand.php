@@ -2,6 +2,7 @@
 
 namespace Src\Commands;
 
+use Src\Domain\DataTable;
 use Src\Domain\DataTableInterface;
 use Src\Utils\ParameterConverter;
 
@@ -18,10 +19,14 @@ readonly class RemoveCommand implements Command {
         $firstLine = $initialData->getHeader();
         $keyToBeRemoved = ParameterConverter::setProperIdentifier($firstLine, $this->columnIdentifier);
 
-        foreach($initialData->getRows() as $row) {
-            $row->remove($keyToBeRemoved);
+        $columnsKept = array_filter($initialData->getHeader(), fn($item) => !str_ends_with($item, $keyToBeRemoved));
+
+        $newDataTable = new DataTable();
+        foreach($initialData->getIterator() as $row) {
+            $newRow = $row->withColumns($columnsKept);
+            $newDataTable->append($newRow);
         }
 
-        return $initialData;
+        return $newDataTable;
     }
 }

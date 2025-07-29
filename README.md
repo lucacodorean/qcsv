@@ -12,27 +12,27 @@ php ../qcsv.php --source=INPUT_STREAM --command=index --destination=DESTINATION_
 ```
 #### Format date-time columns to a given format
 ```php
-php ../qcsv.php --source=INPUT_STREAM --command=format --destination=DESTINATION_STREAM --options=Y/m/d**
+php qcsv.php --source=INPUT_STREAM --command=format --destination=DESTINATION_STREAM --options=Y/m/d
 ```
 #### Remove a column from the data table
 ```php
-php ../qcsv.php --source=INPUT_STREAM --command=remove --destination=DESTINATION_STREAM --options=column**
+php qcsv.php --source=INPUT_STREAM --command=remove --destination=DESTINATION_STREAM --options=columns[]
 ```
 #### Reorder columns in the data table
 ```php
-php ../qcsv.php --source=INPUT_STREAM --command=reorder --destination=DESTINATION_STREAM --options=column**
+php qcsv.php --source=INPUT_STREAM --command=reorder --destination=DESTINATION_STREAM --options=columns[]
 ```
 #### Truncate columns from the data table
 ```php
-php ../qcsv.php  --command=truncate --options=COLUMN --options=TRUNCATE_LENGHT
+php qcsv.php  --command=truncate --options=COLUMN --options=TRUNCATE_LENGHT
 ```
 #### Encrypt & Decrypt columns using Asymmetric Encryption
 ```php
- php ../qcsv.php --source=INPUT_STREAM --command=encrypt --destination=DESTINATION_STREAM --options=COLUMNS[] --public_key_path=PUBLIC_KEY_ORIGIN_STREAM
+ php qcsv.php --source=INPUT_STREAM --command=encrypt --destination=DESTINATION_STREAM --options=COLUMNS[] --public_key_path=PUBLIC_KEY_ORIGIN_STREAM
 
 ```
 ```php
-php ../qcsv.php --source=INPUT_STREAM --command=decrypt --destination=DESTINATION_STREAM--options=COLUMNS[] --private_key_path=PRIVATE_KEY_ORIGIN_STREAM
+php qcsv.php --source=INPUT_STREAM --command=decrypt --destination=DESTINATION_STREAM--options=COLUMNS[] --private_key_path=PRIVATE_KEY_ORIGIN_STREAM
 ```
 #### Sign and verify the signature based on columns of the data table
 ```php

@@ -29,7 +29,9 @@ class ReadServiceImpl implements ReadService
                 $headers = range(0, count($firstLine) - 1);
             }
 
-            $output->append(new Row($firstLine, $headers));
+            if(array_diff($headers, $firstLine) == []) {
+                $output->append(new Row($firstLine, $headers));
+            }
 
             while(!feof($handle)) {
                 $line = fgetcsv($handle,0, ',', '"', '\\');

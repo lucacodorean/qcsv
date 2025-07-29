@@ -3,6 +3,7 @@
 namespace Src\Commands;
 
 use Carbon\Carbon;
+use Src\Domain\DataTable;
 use Src\Domain\DataTableInterface;
 use Carbon\Exceptions\InvalidFormatException;
 use Src\Exceptions\InvalidParametersException;
@@ -35,19 +36,22 @@ readonly class FormatDateCommand implements Command {
         $headers = $initialData->getHeader();
         $hasHeader = $initialData->hasHeader();
 
+        $formattedDataTable = new DataTable;
         try {
-            foreach ($initialData->getRows() as $row) {
-                foreach ($row->getValues() as $key => $entry) {
+            foreach ($initialData->getIterator() as $row) {
+                $newRow = $row->withColumns($headers);
+                foreach ($newRow->getValues() as $key => $entry) {
                     if($this->validateDateTime($entry)) {
-                        $row->set(
+                        $newRow->set(
                             !$hasHeader ? $key : $headers[$key],
                             $this->formatDate($entry, $this->format)
                         );
                     }
                 }
+                $formattedDataTable->append($newRow);
             }
 
-            return $initialData;
+            return $formattedDataTable;
         } catch (InvalidParametersException $e) {
             echo $e->getMessage();
             return $initialData;

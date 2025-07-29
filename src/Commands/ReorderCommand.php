@@ -18,10 +18,13 @@ readonly class ReorderCommand implements Command {
 
     public function execute(DataTableInterface $initialData): DataTableInterface
     {
+        if(count($this->newOrder) != count($initialData->getHeader())) {
+            throw new InvalidParametersException("The number of rows do not match");
+        }
 
         try {
             $newTable = new DataTable();
-            foreach ($initialData->getRows() as $row) {
+            foreach ($initialData->getIterator() as $row) {
                 $orderedRow = new Map;
 
                 foreach ($this->newOrder as $key) {

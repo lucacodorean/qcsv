@@ -2,8 +2,10 @@
 
 namespace Src\Commands;
 
+use Src\Domain\DataTable;
 use Src\Domain\DataTableInterface;
-use Src\Domain\EncryptedDataTable;
+use Src\Domain\VerifiableDataTable;
+use Src\Enums\DataTableStatusEnum;
 
 readonly class EncryptCommand implements Command
 {
@@ -16,29 +18,25 @@ readonly class EncryptCommand implements Command
     }
 
     public function execute(DataTableInterface $initialData): DataTableInterface {
-        $firstLine = $initialData->getHeader();
         foreach ($this->encryptionColumns as $currentEncryptedColumn) {
-            if(!array_search($currentEncryptedColumn, $firstLine)) {
+            if(!array_search($currentEncryptedColumn, $initialData->getHeader())) {
                 echo "Can't find the given column in the table.";
                 exit;
             }
         }
 
-        $hasHeader = $initialData->hasHeader();
+        $encryptedDataTable = new DataTable();
 
-        foreach ($initialData->getRows() as $currentRow) {
-            if($hasHeader) {
-                $hasHeader = false;
-                continue;
-            }
-
+        foreach ($initialData->getIterator() as $currentRow) {
+            $newRow = $currentRow->withColumns($initialData->getHeader());
             foreach($this->encryptionColumns as $currentEncryptionColumn) {
                 openssl_public_encrypt($currentRow->get($currentEncryptionColumn), $encryptedData, $this->publicKey);
-                $currentRow->set($currentEncryptionColumn, base64_encode($encryptedData));
+                $newRow->set($currentEncryptionColumn, base64_encode($encryptedData));
             }
+            $encryptedDataTable->append($newRow);
 
         }
-        return new EncryptedDataTable($initialData, $this->publicKey);
+        return VerifiableDataTable::build($encryptedDataTable,DataTableStatusEnum::ENCRYPTED);
     }
 
 }

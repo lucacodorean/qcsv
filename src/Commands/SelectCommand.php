@@ -38,7 +38,7 @@ class SelectCommand implements Command
     public function execute(DataTableInterface $initialData): DataTableInterface {
 
         $resultData = new DataTable();
-        foreach($initialData->getRows() as $row) {
+        foreach($initialData->getIterator() as $row) {
             if($this->filterPass($row)) {
                 $filtered = $row->withColumns($this->columns);
                 $resultData->append($filtered);

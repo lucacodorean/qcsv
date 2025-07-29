@@ -1,6 +1,7 @@
 <?php
 
 namespace Src\Commands;
+use Src\Domain\DataTable;
 use Src\Domain\DataTableInterface;
 use Src\Utils\ParameterConverter;
 
@@ -14,20 +15,18 @@ readonly class TruncateCommand implements Command {
 
     public function execute(DataTableInterface $initialData): DataTableInterface
     {
-        $firstLine = $initialData->getHeader();
-        $keyToBeTruncated = ParameterConverter::setProperIdentifier($firstLine, $this->columnIdentifier);
+        $header = $initialData->getHeader();
+        $keyToBeTruncated = ParameterConverter::setProperIdentifier($header, $this->columnIdentifier);
 
-        $hasHeaders = $initialData->hasHeader();
-        foreach ($initialData->getRows() as $row) {
-            if($hasHeaders) {
-                $hasHeaders = false;
-                continue;
-            }
+        $newDataTable = new DataTable();
+        foreach ($initialData->getIterator() as $row) {
+            $newRow = $row->withColumns($header);
             if(is_string($row->get($keyToBeTruncated))) {
-                $row->set($keyToBeTruncated, mb_substr($row->get($keyToBeTruncated), 0, $this->length, 'UTF-8'));
+                $newRow->set($keyToBeTruncated, mb_substr($row->get($keyToBeTruncated), 0, $this->length, 'UTF-8'));
             }
+            $newDataTable->append($newRow);
         }
 
-        return $initialData;
+        return $newDataTable;
     }
 }
