@@ -2,6 +2,7 @@
 
 namespace Src\Commands;
 
+use Src\Domain\DataTable;
 use Src\Domain\DataTableInterface;
 
 readonly class IndexCommand implements Command {
@@ -11,11 +12,14 @@ readonly class IndexCommand implements Command {
 
     public function execute(DataTableInterface $initialData): DataTableInterface
     {
-        $index = 1;
-        foreach ($initialData->getRows() as $row) {
-            $row->set("id", $index++);
+        $index = 0;
+        $indexedDataTable = new DataTable;
+        foreach ($initialData->getIterator() as $row) {
+            $newRow = $row->withColumns($initialData->getHeader());
+            $newRow->set("id", $index++);
+            $indexedDataTable->append($newRow);
         }
 
-        return $initialData;
+        return $indexedDataTable;
     }
 }

@@ -15,29 +15,19 @@ class SignCommand implements Command
     }
 
     public function execute(DataTableInterface $initialData): DataTableInterface {
-
-        $hasHeader = $initialData->hasHeader();
         $signedDataTable = new DataTable();
-
-        foreach($initialData->getRows() as $currentRow) {
-            if ($hasHeader) {
-                $hasHeader = false;
-                continue;
-            }
-
-            $signingData = "";
-
+        foreach($initialData->getIterator() as $currentRow) {
+            $newRow = $currentRow->withColumns($currentRow->getKeys());
             foreach ($this->signingColumns as $currentEncryptedColumn) {
-                $signingData .= $currentRow->get($currentEncryptedColumn);
-            }
+                $signingData = $currentRow->get($currentEncryptedColumn);
+                if(!openssl_sign($signingData, $signature, $this->privateKey, OPENSSL_ALGO_SHA256)) {
+                    echo "There was an error at signing the given columns.";
+                    exit;
+                }
 
-            if(!openssl_sign($signingData, $signature, $this->privateKey, OPENSSL_ALGO_SHA256)) {
-                echo "There was an error at signing the given columns.";
-                exit;
+                $newRow->set("{$currentEncryptedColumn}_signed", base64_encode($signature));
             }
-
-            $currentRow->set("signed", base64_encode($signature));
-            $signedDataTable->append($currentRow);
+                $signedDataTable->append($newRow);
         }
 
         return $signedDataTable;
