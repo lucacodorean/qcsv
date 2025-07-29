@@ -4,13 +4,12 @@ namespace Src\Utils;
 
 class ParameterConverter
 {
-    public static function setProperIdentifier(array $firstLine, string $value): string|int {
+    public static function setProperIdentifier(array $header, string $value): string|int {
         $properIdentifier = $value;
-        $header = HeaderWorker::computeHeader($firstLine);
 
         if($header == [] && !is_numeric($value)) {
             echo "Can't operate with a column name. The data table has no header.";
-            exit;
+            exit(1);
         }
 
         else if(is_numeric($value) && $header != [])  {

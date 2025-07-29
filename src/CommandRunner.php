@@ -19,10 +19,9 @@ use Src\Commands\SelectCommand;
 use Src\Commands\SignCommand;
 use Src\Commands\TruncateCommand;
 use Src\Commands\VerifySignCommand;
-use Src\Domain\EncryptedDataTable;
 use Src\Domain\LazyDataTable;
-use Src\Domain\VerifiedDataTable;
 use Src\Input\CommandInput;
+use Src\Services\IO\JsonWriter;
 use Src\Services\IO\ReadService;
 use Src\Services\IO\WriteService;
 use Src\Utils\SelectCondition;
@@ -32,8 +31,8 @@ class CommandRunner
     private ?Command $command = null;
 
     public function __construct(
-        private ReadService $readStream,
-        private WriteService $writeService
+        private ReadService  $readStream,
+        private WriteService $writeService,
     ) {
         //
     }
@@ -143,7 +142,6 @@ class CommandRunner
                 foreach ($input->getOptions()[0] as $option) {
                     if($columns == []) {
                         $columns = explode(',', $option);
-                        continue;
                     } else $conditions[] = SelectCondition::fromOption($option);
                 }
 
@@ -165,16 +163,13 @@ class CommandRunner
             new LazyDataTable($this->readStream->lazyRead($inputStream));
 
         $resultData = $this->command->execute($initialData);
-
+        if($input->getEnvironment() == "web") {
+            $this->writeService = new JsonWriter();
+            $this->writeService->toStream($resultData, $input->getDestinationStream());
+        }
         $this->writeService->toStream($resultData, $input->getDestinationStream());
-
         if($input->getCommand() == "encrypt" && $resultData instanceof EncryptedDataTable)
             $this->writeService->passMessage($resultData->getPublicKey(), $input->getPublicKeyStream());
-
-        if($input->getCommand() == "verify" && $resultData instanceof VerifiedDataTable) {
-            $this->writeService->passMessage("Document is {$resultData->getStatus()->value}", $input->getDestinationStream());
-        }
-
         exit(0);
     }
 }

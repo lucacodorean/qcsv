@@ -6,18 +6,19 @@ readonly class CommandInput {
 
     private function __construct(
         private string $command,
-        private string $inputStream,
-        private string $destinationStream,
+        private string $inputStream = "php://stdin",
+        private string $destinationStream = "php://stdout",
         private array $options = [],
         private string $publicKeyStream = "",
         private string $privateKeyStream = "",
+        private string $environment = "cli",
     ) {
         ///
     }
 
     public static function fromOpt() : self {
-        $shortOpts = "s::d::c:op::pubk::privk::";
-        $longOpts = ["source:", "destination:", "command:","options::", "public_key_path::", "private_key_path::"];
+        $shortOpts = "s::d::c:op::pubk::privk::env::";
+        $longOpts = ["source:", "destination:", "command:","options::", "public_key_path::", "private_key_path::", "environment::"];
 
         $parsedArguments = getopt($shortOpts, $longOpts);
 
@@ -39,7 +40,8 @@ readonly class CommandInput {
                 $parsedArguments["destination"] ?? $parsedArguments["e"] ?? "php://stdout",
                 $options,
                 $publicKeyStream,
-            $privateKeyStream
+            $privateKeyStream,
+            $parsedArguments["environment"] ?? $parsedArguments["env"] ?? "cli"
         );
     }
 
@@ -66,5 +68,9 @@ readonly class CommandInput {
     public function getPrivateKeyStream(): string
     {
         return $this->privateKeyStream;
+    }
+
+    public function getEnvironment(): string {
+        return $this->environment;
     }
 }
