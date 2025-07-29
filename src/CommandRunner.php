@@ -163,10 +163,6 @@ class CommandRunner
             new LazyDataTable($this->readStream->lazyRead($inputStream));
 
         $resultData = $this->command->execute($initialData);
-        if($input->getEnvironment() == "web") {
-            $this->writeService = new JsonWriter();
-            $this->writeService->toStream($resultData, $input->getDestinationStream());
-        }
         $this->writeService->toStream($resultData, $input->getDestinationStream());
         if($input->getCommand() == "encrypt" && $resultData instanceof EncryptedDataTable)
             $this->writeService->passMessage($resultData->getPublicKey(), $input->getPublicKeyStream());
