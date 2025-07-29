@@ -1,6 +1,6 @@
 <?php
 
-namespace Src\Services;
+namespace Src\Services\IO;
 
 use Src\Domain\DataTableInterface;
 
@@ -10,20 +10,23 @@ class WriteServiceImpl implements WriteService
     {
         $handle = fopen($destinationStream, 'w');
 
+        $hasHeaders = $table->hasHeader();
+
         foreach($table->getRows() as $row) {
-            fwrite($handle, $row);
+            if($hasHeaders) {
+                fwrite($handle, implode(",", $table->getHeader()) . PHP_EOL);
+                $hasHeaders = false;
+            }
+            else fwrite($handle, $row);
         }
 
         fclose($handle);
     }
 
 
-    public function lazyToStream(DataTableInterface $table, string $destinationStream): void {
-
+    public function passMessage(string $message, string $destinationStream): void {
         $handle = fopen($destinationStream, 'w');
-        foreach ($table->getRows() as $row) {
-            fwrite($handle, $row);
-        }
+        fwrite($handle, $message);
         fclose($handle);
     }
 }

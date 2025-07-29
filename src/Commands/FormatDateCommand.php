@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use Src\Domain\DataTableInterface;
 use Carbon\Exceptions\InvalidFormatException;
 use Src\Exceptions\InvalidParametersException;
-use Src\Utils\HeaderWorker;
 
 readonly class FormatDateCommand implements Command {
 
@@ -33,17 +32,15 @@ readonly class FormatDateCommand implements Command {
 
     public function execute(DataTableInterface $initialData): DataTableInterface
     {
-        $firstLine = $initialData->getRows()->first();
-        $headers = HeaderWorker::computeHeader($firstLine->toArray());
-        $hasHeaders = $headers != [];
+        $headers = $initialData->getHeader();
+        $hasHeader = $initialData->hasHeader();
 
-        $labels = $firstLine->getKeys();
         try {
             foreach ($initialData->getRows() as $row) {
                 foreach ($row->getValues() as $key => $entry) {
                     if($this->validateDateTime($entry)) {
                         $row->set(
-                            !$hasHeaders ? $key : $labels[$key],
+                            !$hasHeader ? $key : $headers[$key],
                             $this->formatDate($entry, $this->format)
                         );
                     }

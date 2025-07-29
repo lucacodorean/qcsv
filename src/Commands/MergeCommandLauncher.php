@@ -15,14 +15,14 @@ class MergeCommandLauncher implements Command {
     }
 
     public function execute(DataTableInterface $initialData): DataTableInterface {
-        $firstLine = $initialData->getRows()->current();
+        $firstLine = $initialData->getHeader();
 
         $result = new MergedLazyDataTable();
         $result->addSubTable($initialData);
 
         foreach ($this->secondaryDataTable as $secondaryDataTable) {
             $result->addSubTable(
-                new MergeCommand($initialData, $firstLine)->execute($secondaryDataTable)
+                new MergeCommand($firstLine, $initialData->hasHeader())->execute($secondaryDataTable)
             );
         }
 

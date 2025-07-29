@@ -3,3 +3,4 @@ bin
 docke*
 /public/
 /vendor/
+.env

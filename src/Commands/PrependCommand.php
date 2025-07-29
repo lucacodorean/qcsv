@@ -3,6 +3,7 @@
 namespace Src\Commands;
 
 
+use Src\Domain\DataTable;
 use Src\Domain\DataTableInterface;
 use Src\Domain\Row;
 use Src\Exceptions\InvalidParametersException;
@@ -22,7 +23,7 @@ readonly class PrependCommand implements Command
             return $initialData;
         } catch (InvalidParametersException $e) {
             echo $e->getMessage();
-            return new DataTableInterface();
+            return new DataTable;
         }
     }
 }

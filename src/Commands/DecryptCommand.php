@@ -1,0 +1,37 @@
+<?php
+
+namespace Src\Commands;
+
+use Src\Domain\DataTableInterface;
+
+readonly class DecryptCommand implements Command
+{
+    public function __construct(
+        private string $privateKey,
+        private array $encryptedColumns
+    ) {
+        ///
+    }
+
+    public function execute(DataTableInterface $initialData): DataTableInterface {
+        $hasHeader = $initialData->hasHeader();
+        foreach($initialData->getRows() as $currentRow) {
+            if($hasHeader) {
+                $hasHeader = false;
+                continue;
+            }
+
+            foreach($this->encryptedColumns as $currentEncryptedColumn) {
+                $status = openssl_private_decrypt(base64_decode($currentRow->get($currentEncryptedColumn)), $decrypted, $this->privateKey);
+                if(!$status) {
+                    echo "There was an error at decrypting. Given public key may be invalid";
+                    exit;
+                }
+
+                $currentRow->set($currentEncryptedColumn, $decrypted);
+            }
+        }
+
+        return $initialData;
+    }
+}

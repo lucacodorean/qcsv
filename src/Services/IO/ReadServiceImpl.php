@@ -1,14 +1,13 @@
 <?php
 
-namespace Src\Services;
+namespace Src\Services\IO;
 
 use Generator;
-use Src\Domain\LazyDataTable;
-use Src\Domain\Row;
 use Src\Domain\DataTable;
-use Src\Utils\HeaderWorker;
 use Src\Domain\DataTableInterface;
+use Src\Domain\Row;
 use Src\Exceptions\InvalidParametersException;
+use Src\Utils\HeaderWorker;
 
 class ReadServiceImpl implements ReadService
 {
@@ -29,7 +28,8 @@ class ReadServiceImpl implements ReadService
                 echo "No headers for the stream $stream. Setting index-based." . PHP_EOL;
                 $headers = range(0, count($firstLine) - 1);
             }
-            $output->append(new Row($headers, $headers));
+
+            $output->append(new Row($firstLine, $headers));
 
             while(!feof($handle)) {
                 $line = fgetcsv($handle,0, ',', '"', '\\');
@@ -60,18 +60,25 @@ class ReadServiceImpl implements ReadService
             $headers = range(0, count($firstLine) - 1);
         }
 
+        while(!feof($handle)) {
+            $line = fgetcsv($handle,0, ',', '"', '\\');
+            if(!$line) continue;
 
-        if (flock($handle, LOCK_SH)) {
-            while(!feof($handle)) {
-                $line = fgetcsv($handle,0, ',', '"', '\\');
-                if(!$line) continue;
-
-                yield new Row($line, $headers);
-            }
-            flock($handle, LOCK_UN);
-        } else {
-            throw new RuntimeException("Unable to acquire shared lock");
+            yield new Row($line, $headers);
         }
         fclose($handle);
+    }
+
+    public function readEncryptionKey(string $stream): string
+    {
+        $handle = fopen($stream, 'r');
+        if($handle === false) {
+            echo "Could not open stream $stream" . PHP_EOL;
+            exit;
+        }
+
+        $result = stream_get_contents($handle);
+        fclose($handle);
+        return $result;
     }
 }
