@@ -21,9 +21,8 @@ class MergeCommandLauncher implements Command {
         $result->addSubTable($initialData);
 
         foreach ($this->secondaryDataTable as $secondaryDataTable) {
-            $result->addSubTable(
-                new MergeCommand($firstLine, $initialData->hasHeader())->execute($secondaryDataTable)
-            );
+            $command = new MergeCommand($firstLine, $initialData->hasHeader());
+            $result->addSubTable($command->execute($secondaryDataTable));
         }
 
         return $result;
