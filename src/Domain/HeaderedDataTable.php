@@ -2,6 +2,8 @@
 
 namespace Src\Domain;
 
+use Traversable;
+
 abstract class HeaderedDataTable implements DataTableInterface
 {
     public function hasHeader(): bool {
@@ -14,5 +16,16 @@ abstract class HeaderedDataTable implements DataTableInterface
         }
 
         return $allNumeric;
+    }
+
+    public function getIterator(): Traversable
+    {
+        $generator = function() {
+            foreach ($this->getRows() as $row) {
+                yield $row;
+            }
+        };
+
+        return $generator();
     }
 }
