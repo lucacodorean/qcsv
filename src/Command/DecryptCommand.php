@@ -15,7 +15,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
-    name: 'DecryptCommand',
+    name: 'decrypt',
     description: 'Add a short description for your command',
 )]
 class DecryptCommand extends Command

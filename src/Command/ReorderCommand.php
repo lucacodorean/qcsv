@@ -15,7 +15,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
-    name: 'ReorderCommand',
+    name: 'reorder',
     description: 'Reorder the columns in the data table.',
 )]
 class ReorderCommand extends Command

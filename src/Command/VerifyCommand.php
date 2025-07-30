@@ -2,7 +2,6 @@
 
 namespace Src\Command;
 
-use Src\CommandLogic\SignCommandLogic;
 use Src\CommandLogic\VerifySignCommandLogic;
 use Src\Services\IO\JsonWriter;
 use Src\Services\IO\ReadServiceImpl;
@@ -13,11 +12,10 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
-    name: 'VerifyCommand',
-    description: 'Add a short description for your command',
+    name: 'verify',
+    description: 'This command verifies a signed csv.',
 )]
 class VerifyCommand extends Command
 {

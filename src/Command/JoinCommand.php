@@ -3,7 +3,6 @@
 namespace Src\Command;
 
 use Src\CommandLogic\JoinCommandLogic;
-use Src\CommandLogic\MergeCommandLauncher;
 use Src\Domain\LazyDataTable;
 use Src\Services\IO\JsonWriter;
 use Src\Services\IO\ReadServiceImpl;
@@ -14,11 +13,10 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
-    name: 'JoinCommand',
-    description: 'Add a short description for your command',
+    name: 'join',
+    description: 'Join two tables based on a key equality condition',
 )]
 class JoinCommand extends Command
 {
