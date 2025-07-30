@@ -1,11 +1,11 @@
 <?php
 
-namespace Src\Commands;
+namespace Src\CommandLogic;
 
 use Src\Domain\DataTable;
 use Src\Domain\DataTableInterface;
 
-readonly class IndexCommand implements Command {
+readonly class IndexCommandLogic implements Command {
     public function __construct() {
         //
     }

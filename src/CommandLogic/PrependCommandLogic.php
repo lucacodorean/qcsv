@@ -1,6 +1,6 @@
 <?php
 
-namespace Src\Commands;
+namespace Src\CommandLogic;
 
 
 use Src\Domain\DataTable;
@@ -8,7 +8,7 @@ use Src\Domain\DataTableInterface;
 use Src\Domain\Row;
 use Src\Exceptions\InvalidParametersException;
 
-readonly class PrependCommand implements Command
+readonly class PrependCommandLogic implements Command
 {
     public function __construct(
         private array $newHeader,

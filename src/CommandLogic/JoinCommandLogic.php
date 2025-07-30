@@ -1,12 +1,12 @@
 <?php
 
-namespace Src\Commands;
+namespace Src\CommandLogic;
 
 use Src\Domain\DataTable;
 use Src\Domain\DataTableInterface;
 use Ds\Map;
 
-class JoinCommand implements Command
+class JoinCommandLogic implements Command
 {
     public function __construct(
         private DataTableInterface $secondTable,

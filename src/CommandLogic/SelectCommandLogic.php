@@ -1,6 +1,6 @@
 <?php
 
-namespace Src\Commands;
+namespace Src\CommandLogic;
 
 use Src\Domain\DataTable;
 use Src\Domain\DataTableInterface;
@@ -8,15 +8,15 @@ use Src\Domain\Row;
 use Src\Exceptions\InvalidParametersException;
 use Src\Utils\SelectCondition;
 
-class SelectCommand implements Command
+readonly class SelectCommandLogic implements Command
 {
     /**
      * @param array $columns
      * @param array|SelectCondition[] $conditions
      */
     public function __construct(
-        private readonly array $columns = [],
-        private readonly array $conditions = [],
+        private array $columns = [],
+        private array $conditions = [],
     ) {
         ///
     }

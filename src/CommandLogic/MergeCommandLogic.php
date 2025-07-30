@@ -1,10 +1,10 @@
 <?php
 
-namespace Src\Commands;
+namespace Src\CommandLogic;
 use Src\Domain\DataTableInterface;
 use Src\Exceptions\DataTableMergeException;
 
-class MergeCommand implements Command {
+class MergeCommandLogic implements Command {
 
     public function __construct(
         private array $firstTableHeaders,

@@ -1,12 +1,12 @@
 <?php
 
-namespace Src\Commands;
+namespace Src\CommandLogic;
 
 use Src\Domain\DataTable;
 use Src\Domain\DataTableInterface;
 use Src\Utils\ParameterConverter;
 
-readonly class RemoveCommand implements Command {
+readonly class RemoveCommandLogic implements Command {
 
     public function __construct(
          private string $columnIdentifier

@@ -1,6 +1,6 @@
 <?php
 
-namespace Src\Commands;
+namespace Src\CommandLogic;
 
 use Src\Domain\DataTableInterface;
 use Ds\Vector;
@@ -21,7 +21,7 @@ class MergeCommandLauncher implements Command {
         $result->addSubTable($initialData);
 
         foreach ($this->secondaryDataTable as $secondaryDataTable) {
-            $command = new MergeCommand($firstLine, $initialData->hasHeader());
+            $command = new MergeCommandLogic($firstLine, $initialData->hasHeader());
             $result->addSubTable($command->execute($secondaryDataTable));
         }
 
