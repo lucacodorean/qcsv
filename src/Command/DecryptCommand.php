@@ -2,7 +2,7 @@
 
 namespace Src\Command;
 
-use Src\CommandLogic\ReorderCommandLogic;
+use Src\CommandLogic\DecryptCommandLogic;
 use Src\Exceptions\InvalidParametersException;
 use Src\Services\IO\JsonWriter;
 use Src\Services\IO\ReadServiceImpl;
@@ -15,13 +15,12 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
-    name: 'ReorderCommand',
-    description: 'Reorder the columns in the data table.',
+    name: 'DecryptCommand',
+    description: 'Add a short description for your command',
 )]
-class ReorderCommand extends Command
+class DecryptCommand extends Command
 {
     use Writable;
-
     public function __construct(
         private readonly JsonWriter $jsonWriter,
         private readonly TableWriter $tableWriter,
@@ -36,7 +35,8 @@ class ReorderCommand extends Command
         $this
             ->addArgument('source',  InputArgument::OPTIONAL, 'The source stream', 'php://stdin')
             ->addArgument('output',  InputArgument::OPTIONAL, 'The target stream', 'php://stdout')
-            ->addOption('order', 'ord', InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'The new order of the columns.')
+            ->addOption('columns', 'col', InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'The columns to be collected.')
+            ->addOption("private-key-stream", "pk", InputOption::VALUE_REQUIRED, "The private key used to decrypt data.")
             ->addOption("type", 't', InputOption::VALUE_OPTIONAL, 'The type of output', 'json')
         ;
     }
@@ -48,17 +48,12 @@ class ReorderCommand extends Command
     {
         $source = $input->getArgument('source');
         $destination= $input->getArgument('output');
-        $newHeaders = $input->getOption('order');
-
         $dataTable = $this->readService->read($source);
 
-        if(count($newHeaders) != count($dataTable->getHeader())) {
-            echo "Head line is not the same size with the table row." . PHP_EOL;
-            return Command::INVALID;
-        }
+        $privateKey = $this->readService->readEncryptionKey($input->getOption('private-key-stream'));
+        $columns = $input->getOption('columns');
 
-
-        $command = new ReorderCommandLogic($newHeaders);
+        $command = new DecryptCommandLogic($privateKey, $columns);
         $resultDataTable = $command->execute($dataTable);
 
         $this->writeFormatted($input->getOption('type'), $resultDataTable, $destination);

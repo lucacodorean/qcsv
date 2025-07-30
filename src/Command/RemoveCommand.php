@@ -3,7 +3,6 @@
 namespace Src\Command;
 
 use Src\CommandLogic\RemoveCommandLogic;
-use Src\CommandLogic\TruncateCommandLogic;
 use Src\Services\IO\JsonWriter;
 use Src\Services\IO\ReadServiceImpl;
 use Src\Services\IO\TableWriter;
@@ -16,7 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
     name: 'remove',
-    description: 'Add a short description for your command',
+    description: 'Remove column from the data table.',
 )]
 class RemoveCommand extends Command
 {

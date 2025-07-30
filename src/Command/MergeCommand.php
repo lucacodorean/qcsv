@@ -2,8 +2,8 @@
 
 namespace Src\Command;
 
-use Src\CommandLogic\ReorderCommandLogic;
-use Src\Exceptions\InvalidParametersException;
+use Src\CommandLogic\MergeCommandLauncher;
+use Src\Domain\LazyDataTable;
 use Src\Services\IO\JsonWriter;
 use Src\Services\IO\ReadServiceImpl;
 use Src\Services\IO\TableWriter;
@@ -14,11 +14,13 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Ds\Vector;
+
 #[AsCommand(
-    name: 'ReorderCommand',
-    description: 'Reorder the columns in the data table.',
+    name: 'merge',
+    description: 'Merge multiple data tables that have the same column count.',
 )]
-class ReorderCommand extends Command
+class MergeCommand extends Command
 {
     use Writable;
 
@@ -36,29 +38,24 @@ class ReorderCommand extends Command
         $this
             ->addArgument('source',  InputArgument::OPTIONAL, 'The source stream', 'php://stdin')
             ->addArgument('output',  InputArgument::OPTIONAL, 'The target stream', 'php://stdout')
-            ->addOption('order', 'ord', InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'The new order of the columns.')
+            ->addOption('streams', 'str', InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'The streams that contain data.')
             ->addOption("type", 't', InputOption::VALUE_OPTIONAL, 'The type of output', 'json')
         ;
     }
 
-    /**
-     * @throws InvalidParametersException
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $source = $input->getArgument('source');
         $destination= $input->getArgument('output');
-        $newHeaders = $input->getOption('order');
-
         $dataTable = $this->readService->read($source);
 
-        if(count($newHeaders) != count($dataTable->getHeader())) {
-            echo "Head line is not the same size with the table row." . PHP_EOL;
-            return Command::INVALID;
-        }
+        $streams = $input->getOption('streams');
 
+        $streamsVector = new Vector(
+            array_map(fn($currentStream) => new LazyDataTable($this->readService->lazyRead($currentStream)), $streams)
+        );
 
-        $command = new ReorderCommandLogic($newHeaders);
+        $command = new MergeCommandLauncher($streamsVector);
         $resultDataTable = $command->execute($dataTable);
 
         $this->writeFormatted($input->getOption('type'), $resultDataTable, $destination);
