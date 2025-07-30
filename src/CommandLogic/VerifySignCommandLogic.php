@@ -27,6 +27,7 @@ class VerifySignCommandLogic implements Command
 
             foreach ($this->encryptionColumns as $currentEncryptedColumn) {
                 $signingData = $currentRow->get($currentEncryptedColumn);
+                if($currentRow->get($currentEncryptedColumn) == $currentEncryptedColumn) continue;
                 $signatureDecoded = base64_decode($currentRow->get("{$currentEncryptedColumn}_signed"));
 
                 if(!openssl_verify($signingData, $signatureDecoded, $publicKey, OPENSSL_ALGO_SHA256)) {
