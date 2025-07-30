@@ -2,6 +2,7 @@
 
 namespace Src\Controller;
 
+use HttpInvalidParamException;
 use Random\RandomException;
 use Src\CommandLogic\SelectCommandLogic;
 use Src\Domain\LazyDataTable;
@@ -61,6 +62,9 @@ class BasicController extends AbstractController {
         ]);
     }
 
+    /**
+     * @throws HttpInvalidParamException
+     */
     #[Route("/run-select", name: 'select', methods: ['POST'])]
     public function select(
         #[MapRequestPayload(validationFailedStatusCode: Response::HTTP_BAD_REQUEST)] DataTableSelectRequest $request
