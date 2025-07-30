@@ -4,7 +4,7 @@ namespace Src\Services\IO;
 
 use Src\Domain\DataTableInterface;
 
-class WriteServiceImpl implements WriteService
+class TableWriter implements WriteService
 {
     public function toStream(DataTableInterface $table, string $destinationStream): void
     {
