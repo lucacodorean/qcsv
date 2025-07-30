@@ -5,7 +5,7 @@ require __DIR__ . '/vendor/autoload.php';
 use Src\CommandRunner;
 use Src\Input\CommandInput;
 use Src\Services\IO\ReadServiceImpl;
-use Src\Services\IO\WriteServiceImpl;
+use Src\Services\IO\TableWriter;
 use Symfony\Component\Dotenv\Dotenv;
 
 $dotenv = new Dotenv();
@@ -16,7 +16,7 @@ try {
 
     new CommandRunner(
         new ReadServiceImpl(),
-        new WriteServiceImpl()
+        new TableWriter()
     )->run($commandInput);
 
 

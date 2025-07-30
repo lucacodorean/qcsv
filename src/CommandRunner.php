@@ -5,20 +5,20 @@ namespace Src;
 use Carbon\Carbon;
 use Carbon\Exceptions\InvalidFormatException;
 use Ds\Vector;
-use Src\Commands\Command;
-use Src\Commands\DecryptCommand;
-use Src\Commands\EncryptCommand;
-use Src\Commands\FormatDateCommand;
-use Src\Commands\IndexCommand;
-use Src\Commands\JoinCommand;
-use Src\Commands\MergeCommandLauncher;
-use Src\Commands\PrependCommand;
-use Src\Commands\RemoveCommand;
-use Src\Commands\ReorderCommand;
-use Src\Commands\SelectCommand;
-use Src\Commands\SignCommand;
-use Src\Commands\TruncateCommand;
-use Src\Commands\VerifySignCommand;
+use Src\CommandLogic\Command;
+use Src\CommandLogic\DecryptCommandLogic;
+use Src\CommandLogic\EncryptCommandLogic;
+use Src\CommandLogic\FormatDateCommandLogic;
+use Src\CommandLogic\IndexCommandLogic;
+use Src\CommandLogic\JoinCommandLogic;
+use Src\CommandLogic\MergeCommandLauncher;
+use Src\CommandLogic\PrependCommandLogic;
+use Src\CommandLogic\RemoveCommandLogic;
+use Src\CommandLogic\ReorderCommandLogic;
+use Src\CommandLogic\SelectCommandLogic;
+use Src\CommandLogic\SignCommandLogic;
+use Src\CommandLogic\TruncateCommandLogic;
+use Src\CommandLogic\VerifySignCommandLogic;
 use Src\Domain\LazyDataTable;
 use Src\Input\CommandInput;
 use Src\Services\IO\ReadService;
@@ -49,21 +49,21 @@ class CommandRunner
         switch ($input->getCommand()) {
             case "prepend":
                 $newHeaders = explode(',', $input->getOptions()[0]);
-                $this->command = new PrependCommand($newHeaders);
+                $this->command = new PrependCommandLogic($newHeaders);
                 break;
 
             case "index":
-                $this->command = new IndexCommand;
+                $this->command = new IndexCommandLogic;
                 break;
 
             case "remove":
                 $columnIdentifier = $input->getOptions()[0];
-                $this->command = new RemoveCommand($columnIdentifier);
+                $this->command = new RemoveCommandLogic($columnIdentifier);
                 break;
 
             case "reorder":
                 $newOrder = explode(',', $input->getOptions()[0]);
-                $this->command = new ReorderCommand($newOrder);
+                $this->command = new ReorderCommandLogic($newOrder);
                 break;
 
             case "truncate":
@@ -76,7 +76,7 @@ class CommandRunner
                     exit;
                 }
 
-                $this->command = new TruncateCommand($columnIdentifier, $length);
+                $this->command = new TruncateCommandLogic($columnIdentifier, $length);
                 break;
 
             case "format":
@@ -86,7 +86,7 @@ class CommandRunner
                     exit;
                 }
 
-                $this->command = new FormatDateCommand($format);
+                $this->command = new FormatDateCommandLogic($format);
                 break;
 
             case "merge":
@@ -102,35 +102,35 @@ class CommandRunner
                 $columns = explode(',' , $input->getOptions()[0]);
                 $publicKey = $this->readStream->readEncryptionKey($input->getPublicKeyStream());
 
-                $this->command = new EncryptCommand($publicKey, $columns);
+                $this->command = new EncryptCommandLogic($publicKey, $columns);
                 break;
 
             case "decrypt":
                 $columns = explode(',' , $input->getOptions()[0]);
                 $privateKey = $this->readStream->readEncryptionKey($input->getPrivateKeyStream());
 
-                $this->command = new DecryptCommand($privateKey, $columns);
+                $this->command = new DecryptCommandLogic($privateKey, $columns);
                 break;
 
             case "sign":
                 $columns = explode(',' , $input->getOptions()[0]);
                 $privateKey = $this->readStream->readEncryptionKey($input->getPrivateKeyStream());
 
-                $this->command = new SignCommand($privateKey, $columns);
+                $this->command = new SignCommandLogic($privateKey, $columns);
                 break;
 
             case "verify":
                 $columns = explode(',' , $input->getOptions()[0]);
                 $publicKey = $this->readStream->readEncryptionKey($input->getPublicKeyStream());
 
-                $this->command = new VerifySignCommand($publicKey, $columns);
+                $this->command = new VerifySignCommandLogic($publicKey, $columns);
                 break;
 
             case "join":
                 $secondDataTable = new LazyDataTable($this->readStream->lazyRead($input->getOptions()[0][0]));
                 [$columnInFirstTable, $columnInSecondTable] = explode(',', $input->getOptions()[0][1], 2);
 
-                $this->command = new JoinCommand($secondDataTable, $columnInFirstTable, $columnInSecondTable);
+                $this->command = new JoinCommandLogic($secondDataTable, $columnInFirstTable, $columnInSecondTable);
                 break;
 
             case "select":
@@ -144,7 +144,7 @@ class CommandRunner
                     } else $conditions[] = SelectCondition::fromOption($option);
                 }
 
-                $this->command = new SelectCommand($columns, $conditions);
+                $this->command = new SelectCommandLogic($columns, $conditions);
                 break;
             default:
                 echo "Given command is not implemented (at least yet).";
