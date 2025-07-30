@@ -1,6 +1,6 @@
 <?php
 
-namespace Src\Commands;
+namespace Src\CommandLogic;
 
 use Src\Domain\DataTable;
 use Src\Domain\DataTableInterface;
@@ -8,7 +8,7 @@ use Src\Domain\VerifiableDataTable;
 use Src\Enums\DataTableStatusEnum;
 use Src\Exceptions\InvalidParametersException;
 
-readonly class DecryptCommand implements Command
+readonly class DecryptCommandLogic implements Command
 {
     public function __construct(
         private string $privateKey,

@@ -1,11 +1,11 @@
 <?php
 
-namespace Src\Commands;
+namespace Src\CommandLogic;
 use Src\Domain\DataTable;
 use Src\Domain\DataTableInterface;
 use Src\Utils\ParameterConverter;
 
-readonly class TruncateCommand implements Command {
+readonly class TruncateCommandLogic implements Command {
 
     public function __construct(
         private string|int $columnIdentifier,

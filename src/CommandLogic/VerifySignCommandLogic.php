@@ -1,6 +1,6 @@
 <?php
 
-namespace Src\Commands;
+namespace Src\CommandLogic;
 
 use Src\Domain\DataTable;
 use Src\Domain\DataTableInterface;
@@ -8,7 +8,7 @@ use Src\Domain\VerifiableDataTable;
 use Src\Enums\DataTableStatusEnum;
 use Src\Exceptions\InvalidParametersException;
 
-class VerifySignCommand implements Command
+class VerifySignCommandLogic implements Command
 {
     public function __construct(
         private string $publicKeyPem,
@@ -27,6 +27,7 @@ class VerifySignCommand implements Command
 
             foreach ($this->encryptionColumns as $currentEncryptedColumn) {
                 $signingData = $currentRow->get($currentEncryptedColumn);
+                if($currentRow->get($currentEncryptedColumn) == $currentEncryptedColumn) continue;
                 $signatureDecoded = base64_decode($currentRow->get("{$currentEncryptedColumn}_signed"));
 
                 if(!openssl_verify($signingData, $signatureDecoded, $publicKey, OPENSSL_ALGO_SHA256)) {

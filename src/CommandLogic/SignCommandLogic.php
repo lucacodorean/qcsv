@@ -1,11 +1,11 @@
 <?php
 
-namespace Src\Commands;
+namespace Src\CommandLogic;
 
 use Src\Domain\DataTable;
 use Src\Domain\DataTableInterface;
 
-class SignCommand implements Command
+class SignCommandLogic implements Command
 {
     public function __construct(
         private string $privateKey,

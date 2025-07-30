@@ -1,6 +1,6 @@
 <?php
 
-namespace Src\Commands;
+namespace Src\CommandLogic;
 
 use Src\Domain\DataTable;
 use Src\Domain\DataTableInterface;
@@ -8,7 +8,7 @@ use Ds\Map;
 use Src\Domain\Row;
 use Src\Exceptions\InvalidParametersException;
 
-readonly class ReorderCommand implements Command {
+readonly class ReorderCommandLogic implements Command {
 
     public function __construct(
         private array $newOrder

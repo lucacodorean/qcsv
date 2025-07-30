@@ -1,6 +1,6 @@
 <?php
 
-namespace Src\Commands;
+namespace Src\CommandLogic;
 
 use Carbon\Carbon;
 use Src\Domain\DataTable;
@@ -8,7 +8,7 @@ use Src\Domain\DataTableInterface;
 use Carbon\Exceptions\InvalidFormatException;
 use Src\Exceptions\InvalidParametersException;
 
-readonly class FormatDateCommand implements Command {
+readonly class FormatDateCommandLogic implements Command {
 
     public function __construct(
             private string $format

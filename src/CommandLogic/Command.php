@@ -1,6 +1,6 @@
 <?php
 
-namespace Src\Commands;
+namespace Src\CommandLogic;
 use Src\Domain\DataTableInterface;
 
 interface Command {

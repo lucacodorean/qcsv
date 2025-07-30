@@ -1,13 +1,13 @@
 <?php
 
-namespace Src\Commands;
+namespace Src\CommandLogic;
 
 use Src\Domain\DataTable;
 use Src\Domain\DataTableInterface;
 use Src\Domain\VerifiableDataTable;
 use Src\Enums\DataTableStatusEnum;
 
-readonly class EncryptCommand implements Command
+readonly class EncryptCommandLogic implements Command
 {
     public function __construct(
         private string $publicKey,
